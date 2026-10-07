@@ -2,40 +2,31 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>فروشگاه مجلل</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Tahoma, sans-serif; background-color: #f4f4f4; padding: 20px; }
-        .product-card { background: #fff; border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 2px 2px 5px #ccc; }
-        h1 { color: #333; text-align: center; }
+        body { background: #1a1a1a; color: #d4af37; text-align: center; font-family: Tahoma; }
+        .grid { display: flex; justify-content: center; gap: 15px; margin: 20px; }
+        .item { border: 1px solid #d4af37; padding: 10px; width: 200px; }
     </style>
 </head>
 <body>
-    <h1>محصولات فروشگاه مجلل</h1>
-    <div id="app">در حال بارگذاری محصولات...</div>
+    <h1>فروشگاه مجلل</h1>
+    <div class="grid">
+        <button onclick="load('موبایل')">موبایل</button>
+        <button onclick="load('لوازم خانگی')">لوازم خانگی</button>
+        <button onclick="load('سرویس چوب')">سرویس چوب</button>
+    </div>
+    <div id="list"></div>
 
     <script>
-        const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-        // کلید anon/public خودت را اینجا بگذار
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
+        const supabase = supabase.createClient('https://fermurffpsawrpulsxun.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg');
 
-        // اسم این متغیر را تغییر دادیم تا تداخل نداشته باشد
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function fetchProducts() {
-            const app = document.getElementById('app');
-            try {
-                // اینجا هم از supabaseClient استفاده می‌کنیم
-                const { data, error } = await supabaseClient.from('products').select('*');
-                if (error) { app.innerHTML = `<p style="color:red;">خطا: ${error.message}</p>`; return; }
-                if (!data || data.length === 0) { app.innerHTML = '<p>محصولی یافت نشد.</p>'; return; }
-                app.innerHTML = '';
-                data.forEach(p => {
-                    app.innerHTML += `<div class="product-card"><h2>${p.title}</h2><p>قیمت: ${p.price ? p.price.toLocaleString('fa-IR') : '۰'} تومان</p><p>${p.description || ''}</p></div>`;
-                });
-            } catch (err) { app.innerHTML = '<p style="color:red;">خطای سیستمی رخ داد.</p>'; }
+        async function load(cat) {
+            const list = document.getElementById('list');
+            list.innerHTML = 'در حال دریافت...';
+            const { data } = await supabase.from('products').select('*').eq('category', cat);
+            list.innerHTML = data.map(item => `<div class="item"><h3>${item.title}</h3><p>${item.price} تومان</p></div>`).join('');
         }
-        fetchProducts();
     </script>
 </body>
 </html>
