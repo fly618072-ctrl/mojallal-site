@@ -2,31 +2,67 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <title>فروشگاه مجلل</title>
+    <!-- اضافه کردن کتابخانه سوپابیس -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #1a1a1a; color: #d4af37; text-align: center; font-family: Tahoma; }
-        .grid { display: flex; justify-content: center; gap: 15px; margin: 20px; }
-        .item { border: 1px solid #d4af37; padding: 10px; width: 200px; }
+        body { background-color: #1a1a1a; color: #d4af37; font-family: Tahoma, sans-serif; text-align: center; }
+        .product-card { border: 1px solid #d4af37; padding: 15px; margin: 10px; display: inline-block; width: 200px; }
+        button { background-color: #d4af37; color: black; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body>
+
     <h1>فروشگاه مجلل</h1>
-    <div class="grid">
-        <button onclick="load('موبایل')">موبایل</button>
-        <button onclick="load('لوازم خانگی')">لوازم خانگی</button>
-        <button onclick="load('سرویس چوب')">سرویس چوب</button>
+
+    <div class="categories">
+        <button onclick="filterProducts('all')">همه محصولات</button>
+        <button onclick="filterProducts('موبایل')">موبایل</button>
+        <button onclick="filterProducts('لوازم خانگی')">لوازم خانگی</button>
+        <button onclick="filterProducts('سرویس چوب')">سرویس چوب</button>
     </div>
-    <div id="list"></div>
+
+    <div id="products-list">در حال بارگذاری...</div>
 
     <script>
-        const supabase = supabase.createClient('https://fermurffpsawrpulsxun.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg');
+        // ۱. مقداردهی سوپابیس (حتماً key خودت را اینجا بگذار)
+        const supabaseUrl = 'https://fermurffpsawrpulsxun.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg'; // <--- کلید anon خودت را اینجا بذار
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function load(cat) {
-            const list = document.getElementById('list');
-            list.innerHTML = 'در حال دریافت...';
-            const { data } = await supabase.from('products').select('*').eq('category', cat);
-            list.innerHTML = data.map(item => `<div class="item"><h3>${item.title}</h3><p>${item.price} تومان</p></div>`).join('');
+        // ۲. تابع اصلی برای دریافت و فیلتر کردن
+        async function filterProducts(category) {
+            const list = document.getElementById('products-list');
+            list.innerHTML = 'در حال بارگذاری...';
+
+            let query = supabaseClient.from('products').select('*');
+
+            // اگر دسته‌بندی خاصی انتخاب شده، فیلتر کن
+            if (category !== 'all') {
+                query = query.eq('category', category);
+            }
+
+            const { data, error } = await query;
+
+            if (error) {
+                list.innerHTML = 'خطا در بارگذاری: ' + error.message;
+                return;
+            }
+
+            if (data.length === 0) {
+                list.innerHTML = 'محصولی یافت نشد.';
+            } else {
+                list.innerHTML = data.map(item => `
+                    <div class="product-card">
+                        <h3>${item.title}</h3>
+                        <p>${item.price} تومان</p>
+                    </div>
+                `).join('');
+            }
         }
+
+        // اجرا در زمان لود اولیه
+        filterProducts('all');
     </script>
 </body>
 </html>
