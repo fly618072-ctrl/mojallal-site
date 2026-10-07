@@ -17,8 +17,8 @@
     <script>
         const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
         
-        // فقط کلیدی که با sb_publishable شروع می‌شود را اینجا کپی کن
-        const SUPABASE_KEY = 'اینجا_کلید_sb_publishable_را_بنویس';
+        // فقط کلیدی که در بخش anon/public بود را اینجا پیست کن
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -26,32 +26,14 @@
             const app = document.getElementById('app');
             try {
                 const { data, error } = await supabase.from('products').select('*');
-                
-                if (error) {
-                    app.innerHTML = `<p style="color:red;">خطا در اتصال: ${error.message}</p>`;
-                    return;
-                }
-
-                if (!data || data.length === 0) {
-                    app.innerHTML = '<p style="text-align:center;">هنوز محصولی در دیتابیس ثبت نشده است.</p>';
-                    return;
-                }
-
+                if (error) { app.innerHTML = `<p style="color:red;">خطا: ${error.message}</p>`; return; }
+                if (!data || data.length === 0) { app.innerHTML = '<p>محصولی یافت نشد.</p>'; return; }
                 app.innerHTML = '';
                 data.forEach(p => {
-                    app.innerHTML += `
-                        <div class="product-card">
-                            <h2>${p.title}</h2>
-                            <p>قیمت: ${p.price ? p.price.toLocaleString('fa-IR') : '۰'} تومان</p>
-                            <p>${p.description || ''}</p>
-                        </div>
-                    `;
+                    app.innerHTML += `<div class="product-card"><h2>${p.title}</h2><p>قیمت: ${p.price ? p.price.toLocaleString('fa-IR') : '۰'} تومان</p><p>${p.description || ''}</p></div>`;
                 });
-            } catch (err) {
-                app.innerHTML = '<p style="color:red;">خطای سیستمی رخ داد.</p>';
-            }
+            } catch (err) { app.innerHTML = '<p style="color:red;">خطای سیستمی رخ داد.</p>'; }
         }
-
         fetchProducts();
     </script>
 </body>
