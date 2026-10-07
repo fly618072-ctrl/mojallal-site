@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه مجلل - مشهد</title>
+    <!-- اتصال به کتابخانه سوپابیس -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #121212; color: #f5f5f5; margin: 0; padding: 0; text-align: center; }
+        header { background: #000; border-bottom: 2px solid #d4af37; padding: 20px; }
+        h1 { color: #d4af37; margin: 0; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .product-card { background: #1e1e1e; border: 1px solid #d4af37; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(212, 175, 55, 0.2); text-align: right; }
+        .product-card h2 { color: #d4af37; margin-top: 0; }
+        .price { color: #4CAF50; font-weight: bold; font-size: 1.2em; }
+        .loading { color: #aaa; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>فروشگاه مجلل</h1>
+        <p>عرضه کننده بهترین محصولات در مشهد</p>
+    </header>
+
+    <div class="container">
+        <h2>محصولات ویژه</h2>
+        <div id="products-list">
+            <p class="loading">در حال بارگذاری محصولات از دیتابیس...</p>
+        </div>
+    </div>
+
+    <script>
+        // ۱. آدرس پروژه و کلید خود را اینجا بگذارید
+        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadProducts() {
+            const listDiv = document.getElementById('products-list');
+            
+            const { data, error } = await supabase.from('products').select('*');
+
+            if (error) {
+                listDiv.innerHTML = `<p style="color: #ff6b6b;">خطا در دریافت اطلاعات: ${error.message}</p>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                listDiv.innerHTML = '<p>هنوز محصولی ثبت نشده است.</p>';
+                return;
+            }
+
+            listDiv.innerHTML = '';
+            data.forEach(product => {
+                listDiv.innerHTML += `
+                    <div class="product-card">
+                        <h2>${product.title || 'بدون عنوان'}</h2>
+                        <p>${product.description || 'توضیحاتی ثبت نشده است.'}</p>
+                        <p class="price">قیمت: ${Number(product.price).toLocaleString()} تومان</p>
+                    </div>
+                `;
+            });
+        }
+
+        loadProducts();
+    </script>
+
+</body>
+</html>
