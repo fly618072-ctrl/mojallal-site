@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>فروشگاه مجلل</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Tahoma, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .product-card { background: #fff; border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 2px 2px 5px #ccc; }
+        h1 { color: #333; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>محصولات فروشگاه مجلل</h1>
+    <div id="app">در حال بارگذاری محصولات...</div>
+
+    <script>
+        const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+        
+        // فقط کلیدی که با sb_publishable شروع می‌شود را اینجا کپی کن
+        const SUPABASE_KEY = 'اینجا_کلید_sb_publishable_را_بنویس';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fetchProducts() {
+            const app = document.getElementById('app');
+            try {
+                const { data, error } = await supabase.from('products').select('*');
+                
+                if (error) {
+                    app.innerHTML = `<p style="color:red;">خطا در اتصال: ${error.message}</p>`;
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    app.innerHTML = '<p style="text-align:center;">هنوز محصولی در دیتابیس ثبت نشده است.</p>';
+                    return;
+                }
+
+                app.innerHTML = '';
+                data.forEach(p => {
+                    app.innerHTML += `
+                        <div class="product-card">
+                            <h2>${p.title}</h2>
+                            <p>قیمت: ${p.price ? p.price.toLocaleString('fa-IR') : '۰'} تومان</p>
+                            <p>${p.description || ''}</p>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                app.innerHTML = '<p style="color:red;">خطای سیستمی رخ داد.</p>';
+            }
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>
