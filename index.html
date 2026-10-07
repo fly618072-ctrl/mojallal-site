@@ -16,16 +16,17 @@
 
     <script>
         const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-        
-        // فقط کلیدی که در بخش anon/public بود را اینجا پیست کن
+        // کلید anon/public خودت را اینجا بگذار
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // اسم این متغیر را تغییر دادیم تا تداخل نداشته باشد
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function fetchProducts() {
             const app = document.getElementById('app');
             try {
-                const { data, error } = await supabase.from('products').select('*');
+                // اینجا هم از supabaseClient استفاده می‌کنیم
+                const { data, error } = await supabaseClient.from('products').select('*');
                 if (error) { app.innerHTML = `<p style="color:red;">خطا: ${error.message}</p>`; return; }
                 if (!data || data.length === 0) { app.innerHTML = '<p>محصولی یافت نشد.</p>'; return; }
                 app.innerHTML = '';
