@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پنل مدیریت فروشگاه مجلل</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0b0b0d; --surface: #151518; --line: rgba(255, 255, 255, 0.08);
+      --gold: #d4af37; --text: #f0f0f3; --text-muted: #8e8e99;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+    body {
+      background-color: var(--bg); color: var(--text);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .admin-card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 20px; width: 100%; max-width: 480px; padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    h2 { color: var(--gold); margin-bottom: 20px; text-align: center; font-size: 20px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--text-muted); }
+    input, select, textarea {
+      width: 100%; background: #1c1c21; border: 1px solid var(--line);
+      color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+    textarea { resize: vertical; min-height: 90px; }
+    button {
+      width: 100%; background: var(--gold); color: #000; border: none;
+      padding: 14px; border-radius: 10px; font-weight: 700; font-size: 15px;
+      cursor: pointer; margin-top: 10px; transition: opacity 0.2s;
+    }
+    button:disabled { opacity: 0.5; }
+    #admin-panel { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-card">
+    
+    <!-- ورود مدیر -->
+    <div id="login-section">
+      <h2>🔒 پنل مدیریت مجلل</h2>
+      <div class="form-group">
+        <label>رمز عبور مدیریت:</label>
+        <input type="password" id="admin-password" placeholder="رمز را وارد کنید...">
+      </div>
+      <button onclick="checkAdminPassword()">ورود به پنل</button>
+    </div>
+
+    <!-- فرم افزودن محصول -->
+    <div id="admin-panel">
+      <h2>✨ ثبت آگهی جدید</h2>
+      <form onsubmit="publishAd(event)">
+        <div class="form-group">
+          <label>عنوان آگهی *</label>
+          <input type="text" id="title" placeholder="مثلاً: شیائومی نوت 14 پرو" required>
+        </div>
+        <div class="form-group">
+          <label>دسته‌بندی *</label>
+          <select id="category" required>
+            <option value="موبایل">موبایل</option>
+            <option value="لوازم خانگی">لوازم خانگی</option>
+            <option value="سرویس چوب">سرویس چوب</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>قیمت (تومان) *</label>
+          <input type="number" id="price" placeholder="مثلاً: 25000000" required>
+        </div>
+        <div class="form-group">
+          <label>لینک مستقیم تصویر (از imgbb) *</label>
+          <input type="url" id="image_url" placeholder="https://i.ibb.co/..." required>
+        </div>
+        <div class="form-group">
+          <label>توضیحات و مشخصات آگهی</label>
+          <textarea id="desc" placeholder="توضیحات مربوط به کالا..."></textarea>
+        </div>
+        <button type="submit" id="submitBtn">انتشار فوری آگهی</button>
+      </form>
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="index.html" style="color: var(--gold); font-size: 13px; text-decoration: none;">← مشاهده فروشگاه</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // رمز عبور پیش‌فرض شما
+    const ADMIN_PASS = '1234';
+
+    const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+    const SUPABASE_ANON_KEY = 'GAPGPTMASKTOKENzfdmbdhckheX1X';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function checkAdminPassword() {
+      const pass = document.getElementById('admin-password').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+      } else {
+        alert('رمز عبور مدیریت اشتباه است!');
+      }
+    }
+
+    async function publishAd(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال ثبت در دیتابیس...';
+
+      const item = {
+        title: document.getElementById('title').value.trim(),
+        category: document.getElementById('category').value,
+        price: Number(document.getElementById('price').value),
+        image_url: document.getElementById('image_url').value.trim(),
+        description: document.getElementById('desc').value.trim()
+      };
+
+      try {
+        const { error } = await supabaseClient.from('products').insert([item]);
+        if (error) throw error;
+
+        alert('✅ آگهی با موفقیت ثبت شد و در سایت قرار گرفت!');
+        e.target.reset();
+      } catch (err) {
+        alert('خطا در ثبت: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'انتشار فوری آگهی';
+      }
+    }
+  </script>
+</body>
+</html>
