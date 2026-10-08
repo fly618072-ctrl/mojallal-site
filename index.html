@@ -1,319 +1,212 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b0b0d">
-<title>فروشگاه مجلل</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{
-  --bg:#0b0b0d; --surface:#151518; --surface-2:#1b1b1f; --line:rgba(255,255,255,.07);
-  --gold:#d4af37; --gold-light:#f3e5ab; --text:#f6f3ec; --muted:#9b9a96; --radius:18px;
-  --gold-grad:linear-gradient(135deg,#f3e5ab 0%,#d4af37 48%,#a67c00 100%);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;color:var(--text);line-height:1.6;
-  font-family:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;
-  background-color:var(--bg);
-  background-image:radial-gradient(900px 380px at 50% -140px,rgba(212,175,55,.13),transparent 70%);
-  background-repeat:no-repeat}
-::selection{background:var(--gold);color:#000}
-button{font:inherit}
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>فروشگاه مجلل</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --surface: #151518;
+      --surface-2: #1e1e24;
+      --line: rgba(255, 255, 255, 0.08);
+      --gold: #d4af37;
+      --text: #f0f0f3;
+      --text-muted: #8e8e99;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto;
+      padding: 18px 20px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--gold); }
+    .brand-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 
-/* سربرگ */
-.hero{text-align:center;padding:46px 20px 28px}
-.logo{width:60px;height:60px;margin:0 auto 16px;border-radius:19px;display:grid;place-items:center;
-  font-size:1.9rem;font-weight:800;color:#1a1405;background:var(--gold-grad);
-  box-shadow:0 12px 32px -10px rgba(212,175,55,.6),inset 0 1px 0 rgba(255,255,255,.55)}
-.hero h1{margin:0;font-size:clamp(1.8rem,5.5vw,2.7rem);font-weight:800;line-height:1.3;
-  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{margin:10px auto 0;max-width:520px;color:var(--muted);font-size:.95rem}
-.orn{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:20px;color:var(--gold);font-size:.7rem}
-.orn::before,.orn::after{content:"";width:72px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
-.orn::after{transform:scaleX(-1)}
+    .categories-bar {
+      max-width: 1200px; margin: 24px auto 16px; padding: 0 20px;
+      display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
+    }
+    .categories-bar::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      background: var(--surface); border: 1px solid var(--line); color: var(--text-muted);
+      padding: 8px 18px; border-radius: 30px; font-size: 14px; cursor: pointer; white-space: nowrap; transition: 0.2s;
+    }
+    .cat-btn.active, .cat-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600; }
 
-/* فیلتر دسته‌بندی */
-.filters-wrap{position:sticky;top:0;z-index:50;background:rgba(11,11,13,.78);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-block:1px solid var(--line)}
-.category-filters{display:flex;gap:10px;max-width:1240px;margin:0 auto;padding:12px 16px;overflow-x:auto;scrollbar-width:none}
-.category-filters::-webkit-scrollbar{display:none}
-.filter-btn:first-child{margin-inline-start:auto}
-.filter-btn:last-child{margin-inline-end:auto}
-.filter-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:500;
-  color:var(--text);background:var(--surface);border:1px solid var(--line);padding:9px 20px;border-radius:999px;
-  cursor:pointer;transition:border-color .25s,color .25s,background .25s,box-shadow .25s}
-.filter-btn:hover{border-color:rgba(212,175,55,.6);color:var(--gold-light)}
-.filter-btn.active{background:var(--gold-grad);color:#1a1405;border-color:transparent;font-weight:700;
-  box-shadow:0 8px 22px -8px rgba(212,175,55,.65)}
+    main { max-width: 1200px; margin: 0 auto; padding: 10px 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+      overflow: hidden; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column;
+    }
+    .card:hover { transform: translateY(-5px); border-color: rgba(212, 175, 55, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .card-img-wrapper { width: 100%; height: 200px; background: #111; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .card:hover .card-img { transform: scale(1.05); }
+    .card-content { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+    .card-cat { font-size: 11px; color: var(--gold); margin-bottom: 6px; font-weight: 600; }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .card-price { font-size: 16px; font-weight: 800; color: #fff; }
+    .card-price span { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+    .status-box { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 
-/* محتوا */
-.container{max-width:1240px;margin:0 auto;padding:26px 16px 56px}
-.toolbar{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
-.toolbar h2{margin:0;font-size:1.15rem;font-weight:700}
-.toolbar h2::before{content:"";display:inline-block;width:4px;height:1em;margin-inline-end:10px;
-  vertical-align:-2px;border-radius:4px;background:var(--gold-grad)}
-.toolbar span{color:var(--muted);font-size:.85rem}
-.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@media(min-width:640px){.products-grid{grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:20px}}
-
-/* کارت محصول */
-.product-card{position:relative;display:flex;flex-direction:column;overflow:hidden;cursor:pointer;
-  background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--line);
-  border-radius:var(--radius);animation:rise .6s cubic-bezier(.2,.7,.2,1) both;
-  transition:border-color .3s,box-shadow .3s}
-.product-card:hover,.product-card:focus-visible{border-color:rgba(212,175,55,.6);
-  box-shadow:0 18px 40px -16px rgba(212,175,55,.3)}
-.card-image-box{position:relative;aspect-ratio:1/1;background:#0a0a0b;overflow:hidden}
-.card-image-box::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;pointer-events:none;
-  background:linear-gradient(transparent,rgba(0,0,0,.5))}
-.card-image-box img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.product-card:hover .card-image-box img{transform:scale(1.06)}
-.card-category{position:absolute;top:10px;right:10px;z-index:2;padding:4px 12px;border-radius:999px;
-  font-size:.72rem;font-weight:500;color:var(--gold-light);background:rgba(12,12,14,.62);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(212,175,55,.3)}
-.no-image{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;color:var(--muted);font-size:.8rem;
-  background:repeating-linear-gradient(45deg,#101012,#101012 10px,#131316 10px,#131316 20px)}
-.no-image i{font-style:normal;font-size:1.8rem;opacity:.6}
-.card-content{display:flex;flex-direction:column;flex:1;gap:12px;padding:14px 14px 15px}
-.card-title{margin:0;font-size:.93rem;font-weight:600;line-height:1.75;min-height:3.5em;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-price{margin-top:auto;display:flex;align-items:baseline;justify-content:flex-end;gap:5px;
-  padding-top:12px;border-top:1px dashed rgba(255,255,255,.1)}
-.card-price .num{font-size:1.1rem;font-weight:800;color:var(--gold-light)}
-.card-price .unit{font-size:.72rem;color:var(--muted)}
-.card-price .call{font-size:.88rem;color:var(--gold)}
-
-/* بارگذاری و خطا */
-.skeleton{border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);overflow:hidden}
-.sk-img{aspect-ratio:1/1}
-.sk-line{height:12px;margin:14px;border-radius:6px}
-.sk-img,.sk-line{background:linear-gradient(100deg,#18181b 30%,#25252a 50%,#18181b 70%);
-  background-size:300% 100%;animation:shimmer 1.4s infinite linear}
-.status-message{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);font-size:1rem}
-.status-message::before{content:"🗂️";display:block;font-size:2.2rem;margin-bottom:10px}
-.status-message.error{color:#ff8a8a}
-.status-message.error::before{content:"⚠️"}
-
-footer{text-align:center;color:var(--muted);font-size:.8rem;padding:24px 16px 34px;border-top:1px solid var(--line)}
-
-/* پنجره جزئیات */
-.modal-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(5,5,6,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.modal-overlay.open{display:flex;animation:fade .25s ease}
-.modal-content{position:relative;width:100%;max-width:920px;max-height:90vh;max-height:90dvh;overflow-y:auto;
-  scrollbar-width:thin;scrollbar-color:#3a3320 transparent;
-  background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid rgba(212,175,55,.35);
-  border-radius:24px;box-shadow:0 40px 90px -20px #000,0 0 60px -24px rgba(212,175,55,.4);
-  animation:pop .35s cubic-bezier(.2,.8,.2,1)}
-.modal-close{position:absolute;top:14px;left:14px;z-index:5;width:38px;height:38px;border-radius:50%;
-  display:grid;place-items:center;font-size:1.4rem;line-height:1;color:var(--text);cursor:pointer;
-  background:rgba(12,12,14,.7);border:1px solid var(--line);transition:background .2s,color .2s}
-.modal-close:hover{background:var(--gold);color:#000}
-.modal-grid{display:grid;grid-template-columns:1fr}
-.modal-image-wrap{display:flex;align-items:center;justify-content:center;min-height:240px;background:#0a0a0b}
-.modal-image-wrap img{display:block;width:100%;max-height:320px;object-fit:contain}
-.modal-image-wrap .no-image{min-height:240px}
-.modal-info{display:flex;flex-direction:column;padding:22px 22px 26px}
-.modal-cat{align-self:flex-start;padding:4px 12px;border-radius:999px;font-size:.75rem;color:var(--gold-light);
-  border:1px solid rgba(212,175,55,.35);background:rgba(212,175,55,.08)}
-.modal-title{margin:12px 0 14px;font-size:1.3rem;font-weight:800;line-height:1.7}
-.modal-price{display:flex;align-items:baseline;gap:6px;padding:14px 0;font-size:1.55rem;font-weight:800;
-  color:var(--gold-light);border-block:1px solid var(--line)}
-.modal-price small{font-size:.85rem;font-weight:500;color:var(--muted)}
-.modal-section-title{display:flex;align-items:center;gap:10px;margin:22px 0 10px;color:var(--gold);font-size:.92rem;font-weight:700}
-.modal-section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(212,175,55,.45),transparent)}
-.modal-desc{padding:14px 16px;border-radius:14px;color:#d2d0ca;font-size:.92rem;line-height:2;white-space:pre-wrap;
-  background:rgba(255,255,255,.03);border:1px solid var(--line)}
-.modal-specs{border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.spec-item{display:grid;grid-template-columns:105px 1fr;gap:12px;padding:11px 16px;font-size:.88rem}
-.spec-item:nth-child(odd){background:rgba(255,255,255,.035)}
-.spec-key{color:var(--muted)}
-.spec-val{color:var(--gold-light);white-space:pre-wrap}
-@media(min-width:760px){
-  .modal-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
-  .modal-image-wrap{min-height:380px}
-  .modal-image-wrap img{max-height:520px}
-  .modal-info{padding:36px 30px 32px}
-}
-@media(max-width:759px){
-  .modal-overlay{align-items:flex-end;padding:0}
-  .modal-content{max-width:none;max-height:92vh;max-height:92dvh;border-radius:26px 26px 0 0;border-bottom:0;
-    animation:sheet .38s cubic-bezier(.2,.8,.2,1)}
-}
-
-@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes fade{from{opacity:0}to{opacity:1}}
-@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
-@keyframes shimmer{from{background-position:100% 0}to{background-position:0 0}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-</style>
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; z-index: 1000; padding: 15px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-window {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; left: 16px; background: rgba(255, 255, 255, 0.08);
+      border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px;
+    }
+    .detail-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 12px; background: #0a0a0c; margin-bottom: 16px; }
+  </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="logo">م</div>
-  <h1>فروشگاه مجلل</h1>
-  <p>مشاهده، بررسی و انتخاب آنلاین آگهی‌ها و کالاها</p>
-  <div class="orn">◆</div>
-</header>
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <span style="font-size: 26px;">👑</span>
+        <span class="brand-title">فروشگاه مجلل</span>
+      </a>
+    </div>
+  </header>
 
-<div class="filters-wrap">
-  <nav class="category-filters">
-    <button class="filter-btn active" onclick="loadProducts('all', this)"><span>🛍️</span>همه محصولات</button>
-    <button class="filter-btn" onclick="loadProducts('موبایل', this)"><span>📱</span>موبایل</button>
-    <button class="filter-btn" onclick="loadProducts('لوازم خانگی', this)"><span>🏠</span>لوازم خانگی</button>
-    <button class="filter-btn" onclick="loadProducts('سرویس چوب', this)"><span>🪵</span>سرویس چوب</button>
-  </nav>
-</div>
-
-<main class="container">
-  <div class="toolbar">
-    <h2 id="sectionTitle">همه محصولات</h2>
-    <span id="countLabel"></span>
+  <div class="categories-bar">
+    <button class="cat-btn active" onclick="filterCategory('همه', this)">همه کالاها</button>
+    <button class="cat-btn" onclick="filterCategory('موبایل', this)">📱 موبایل</button>
+    <button class="cat-btn" onclick="filterCategory('لوازم خانگی', this)">🏠 لوازم خانگی</button>
+    <button class="cat-btn" onclick="filterCategory('سرویس چوب', this)">🛋️ سرویس چوب</button>
   </div>
-  <div id="productsGrid" class="products-grid">
-    <div class="status-message">در حال دریافت کالاها...</div>
+
+  <main>
+    <div id="product-grid" class="grid"></div>
+    <div id="loading" class="status-box">در حال بارگذاری آگهی‌ها...</div>
+  </main>
+
+  <div id="detail-modal" class="modal-backdrop" onclick="if(event.target.id==='detail-modal') closeModal()">
+    <div class="modal-window">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <img id="detail-img" class="detail-img" src="" alt="محصول">
+      <h2 id="detail-title" style="margin-bottom: 10px; font-size: 20px;"></h2>
+      <div id="detail-price" style="font-size: 20px; color: var(--gold); font-weight: 800; margin-bottom: 16px;"></div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">توضیحات:</div>
+      <p id="detail-desc" style="line-height: 1.8; font-size: 14px; color: #ddd;"></p>
+    </div>
   </div>
-</main>
 
-<footer>© فروشگاه مجلل</footer>
+  <script>
+    const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+    const SUPABASE_ANON_KEY = 'GAPGPTMASKTOKENzfdmbdhckheX0X';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<!-- پاپ‌آپ نمایش جزئیات و مشخصات آگهی -->
-<div id="productModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()" aria-label="بستن">&times;</button>
-    <div id="modalBody"></div>
-  </div>
-</div>
+    let allProducts = [];
+    let currentCategory = 'همه';
 
-<script>
-// ۱. اتصال به پایگاه‌داده سوپابیس
-const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg'; // <--- کلید anon خودت را اینجا بگذار
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-let allProductsCache = [];
-const grid = document.getElementById('productsGrid');
-const fa = n => Number(n).toLocaleString('fa-IR');
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const noImg = t => `<div class="no-image"><i>🖼️</i>${t}</div>`;
-const skeletons = () => Array(8).fill('<div class="skeleton"><div class="sk-img"></div><div class="sk-line" style="width:75%"></div><div class="sk-line" style="width:40%"></div></div>').join('');
-
-function imgFail(el) { el.outerHTML = noImg('تصویر در دسترس نیست'); }
-
-// ۲. دریافت و بارگذاری آگهی‌ها
-async function loadProducts(category = 'all', btnElement = null) {
-  if (btnElement) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btnElement.classList.add('active');
-  }
-  document.getElementById('sectionTitle').textContent = category === 'all' ? 'همه محصولات' : category;
-  document.getElementById('countLabel').textContent = '';
-  grid.innerHTML = skeletons();
-
-  try {
-    let query = supabaseClient.from('products').select('*');
-    if (category !== 'all') query = query.eq('category', category);
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      allProductsCache = [];
-      grid.innerHTML = '<div class="status-message">هیچ آگهی در این دسته موجود نیست.</div>';
-      return;
+    function formatPrice(num) {
+      if (!num) return 'توافقی';
+      return Number(num).toLocaleString('fa-IR');
     }
 
-    allProductsCache = data;
-    document.getElementById('countLabel').textContent = fa(data.length) + ' کالا';
-    renderProducts(data);
-  } catch (err) {
-    grid.innerHTML = `<div class="status-message error">خطا: ${esc(err.message)}</div>`;
-  }
-}
+    async function loadProducts() {
+      const loading = document.getElementById('loading');
+      const grid = document.getElementById('product-grid');
+      loading.style.display = 'block';
+      grid.innerHTML = '';
 
-// ۳. ساخت کارت‌ها (عکس بالا، قیمت پایین)
-function renderProducts(items) {
-  grid.innerHTML = items.map((item, index) => {
-    const title = esc(item.title || 'بدون عنوان');
-    const cat = esc(item.category || 'متفرقه');
-    const price = item.price
-      ? `<span class="num">${fa(item.price)}</span><span class="unit">تومان</span>`
-      : '<span class="call">تماس بگیرید</span>';
-    const img = item.image_url
-      ? `<img src="${esc(item.image_url)}" alt="${title}" loading="lazy" onerror="imgFail(this)">`
-      : noImg('بدون تصویر');
+      try {
+        const { data, error } = await supabaseClient
+          .from('products')
+          .select('*')
+          .order('id', { ascending: false });
 
-    return `
-      <article class="product-card" tabindex="0" role="button"
-        style="animation-delay:${Math.min(index, 12) * 45}ms"
-        onclick="openDetails(${index})" onkeydown="if(event.key==='Enter')openDetails(${index})">
-        <div class="card-image-box">${img}<span class="card-category">${cat}</span></div>
-        <div class="card-content">
-          <h3 class="card-title">${title}</h3>
-          <div class="card-price">${price}</div>
-        </div>
-      </article>`;
-  }).join('');
-}
+        if (error) throw error;
+        allProducts = data || [];
+        renderProducts();
+      } catch (err) {
+        console.error(err);
+        loading.textContent = 'خطا در بارگذاری محصولات.';
+      }
+    }
 
-// ۴. باز کردن جزئیات کامل و مشخصات با کلیک روی آگهی
-function openDetails(index) {
-  const item = allProductsCache[index];
-  if (!item) return;
+    function renderProducts() {
+      const loading = document.getElementById('loading');
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
 
-  const title = esc(item.title || 'بدون عنوان');
-  const price = item.price ? `${fa(item.price)} <small>تومان</small>` : '<small>توافقی / تماس بگیرید</small>';
-  const desc = esc(item.description || 'توضیحاتی برای این آگهی ثبت نشده است.');
-  const specs = esc(item.specs || 'مشخصاتی ثبت نشده است.');
-  const img = item.image_url
-    ? `<img src="${esc(item.image_url)}" alt="${title}" onerror="imgFail(this)">`
-    : noImg('بدون تصویر');
+      const filtered = currentCategory === 'همه'
+        ? allProducts
+        : allProducts.filter(p => (p.category || '').trim() === currentCategory);
 
-  document.getElementById('modalBody').innerHTML = `
-    <div class="modal-grid">
-      <div class="modal-image-wrap">${img}</div>
-      <div class="modal-info">
-        <span class="modal-cat">${esc(item.category || 'متفرقه')}</span>
-        <h2 class="modal-title">${title}</h2>
-        <div class="modal-price">${price}</div>
+      loading.style.display = 'none';
 
-        <div class="modal-section-title">توضیحات آگهی</div>
-        <div class="modal-desc">${desc}</div>
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="status-box" style="grid-column: 1/-1;">هیچ آگهی‌ای در این دسته یافت نشد.</div>';
+        return;
+      }
 
-        <div class="modal-section-title">مشخصات فنی و جزئیات</div>
-        <div class="modal-specs">
-          <div class="spec-item"><span class="spec-key">دسته‌بندی</span><span class="spec-val">${esc(item.category || '-')}</span></div>
-          <div class="spec-item"><span class="spec-key">مشخصات کالا</span><span class="spec-val">${specs}</span></div>
-        </div>
-      </div>
-    </div>`;
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const img = p.image_url || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600';
+        
+        card.innerHTML = `
+          <div class="card-img-wrapper">
+            <img class="card-img" src="${img}" alt="${p.title}" loading="lazy">
+          </div>
+          <div class="card-content">
+            <div>
+              <div class="card-cat">${p.category || 'متفرقه'}</div>
+              <h3 class="card-title">${p.title}</h3>
+            </div>
+            <div class="card-price">
+              ${formatPrice(p.price)} <span>تومان</span>
+            </div>
+          </div>
+        `;
+        card.onclick = () => showDetail(p);
+        grid.appendChild(card);
+      });
+    }
 
-  document.querySelector('.modal-content').scrollTop = 0;
-  document.getElementById('productModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
+    function filterCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts();
+    }
 
-function closeModal() {
-  document.getElementById('productModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
+    function showDetail(p) {
+      document.getElementById('detail-img').src = p.image_url || '';
+      document.getElementById('detail-title').textContent = p.title;
+      document.getElementById('detail-price').textContent = `${formatPrice(p.price)} تومان`;
+      document.getElementById('detail-desc').textContent = p.description || 'توضیحی ثبت نشده است.';
+      document.getElementById('detail-modal').classList.add('open');
+    }
 
-function closeModalOnOutsideClick(event) {
-  if (event.target.id === 'productModal') closeModal();
-}
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('open');
+    }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-// بارگذاری اولیه
-loadProducts('all');
-</script>
+    window.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
 </body>
 </html>
