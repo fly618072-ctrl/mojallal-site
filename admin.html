@@ -4,138 +4,183 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>پنل مدیریت فروشگاه مجلل</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-      --bg: #0b0b0d; --surface: #151518; --line: rgba(255, 255, 255, 0.08);
-      --gold: #d4af37; --text: #f0f0f3; --text-muted: #8e8e99;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
     body {
-      background-color: var(--bg); color: var(--text);
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; padding: 20px;
+      background-color: #0f1115;
+      color: #f1f1f1;
+      font-family: Tahoma, sans-serif;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
     }
-    .admin-card {
-      background: var(--surface); border: 1px solid var(--line);
-      border-radius: 20px; width: 100%; max-width: 480px; padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    .container {
+      max-width: 520px;
+      margin: 20px auto;
+      background: #181b20;
+      padding: 25px;
+      border-radius: 14px;
+      border: 1px solid #2a2e39;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    h2 { color: var(--gold); margin-bottom: 20px; text-align: center; font-size: 20px; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--text-muted); }
+    h2 {
+      text-align: center;
+      color: #dfb15b;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      margin: 12px 0 6px;
+      color: #aaa;
+    }
     input, select, textarea {
-      width: 100%; background: #1c1c21; border: 1px solid var(--line);
-      color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333946;
+      background: #0f1115;
+      color: #fff;
+      box-sizing: border-box;
+      font-size: 14px;
+      outline: none;
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--gold); }
-    textarea { resize: vertical; min-height: 90px; }
+    input:focus, select:focus, textarea:focus {
+      border-color: #dfb15b;
+    }
     button {
-      width: 100%; background: var(--gold); color: #000; border: none;
-      padding: 14px; border-radius: 10px; font-weight: 700; font-size: 15px;
-      cursor: pointer; margin-top: 10px; transition: opacity 0.2s;
+      width: 100%;
+      background: #dfb15b;
+      color: #111;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.2s;
     }
-    button:disabled { opacity: 0.5; }
-    #admin-panel { display: none; }
+    button:hover {
+      background: #f1c26b;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #888;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .back-link:hover {
+      color: #dfb15b;
+    }
   </style>
 </head>
 <body>
 
-  <div class="admin-card">
-    
-    <!-- ورود مدیر -->
-    <div id="login-section">
-      <h2>🔒 پنل مدیریت مجلل</h2>
-      <div class="form-group">
-        <label>رمز عبور مدیریت:</label>
-        <input type="password" id="admin-password" placeholder="رمز را وارد کنید...">
-      </div>
-      <button onclick="checkAdminPassword()">ورود به پنل</button>
-    </div>
+<div class="container" id="loginBox">
+  <h2>ورود به پنل مدیریت</h2>
+  <label>رمز عبور ادمین:</label>
+  <input type="password" id="adminPass" placeholder="رمز را وارد کنید...">
+  <button onclick="checkPass()">ورود</button>
+</div>
 
-    <!-- فرم افزودن محصول -->
-    <div id="admin-panel">
-      <h2>✨ ثبت آگهی جدید</h2>
-      <form onsubmit="publishAd(event)">
-        <div class="form-group">
-          <label>عنوان آگهی *</label>
-          <input type="text" id="title" placeholder="مثلاً: شیائومی نوت 14 پرو" required>
-        </div>
-        <div class="form-group">
-          <label>دسته‌بندی *</label>
-          <select id="category" required>
-            <option value="موبایل">موبایل</option>
-            <option value="لوازم خانگی">لوازم خانگی</option>
-            <option value="سرویس چوب">سرویس چوب</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>قیمت (تومان) *</label>
-          <input type="number" id="price" placeholder="مثلاً: 25000000" required>
-        </div>
-        <div class="form-group">
-          <label>لینک مستقیم تصویر (از imgbb) *</label>
-          <input type="url" id="image_url" placeholder="https://i.ibb.co/..." required>
-        </div>
-        <div class="form-group">
-          <label>توضیحات و مشخصات آگهی</label>
-          <textarea id="desc" placeholder="توضیحات مربوط به کالا..."></textarea>
-        </div>
-        <button type="submit" id="submitBtn">انتشار فوری آگهی</button>
-      </form>
-      <div style="text-align: center; margin-top: 16px;">
-        <a href="index.html" style="color: var(--gold); font-size: 13px; text-decoration: none;">← مشاهده فروشگاه</a>
-      </div>
-    </div>
+<div class="container" id="adminPanel" style="display: none;">
+  <h2>ثبت آگهی جدید</h2>
+  
+  <label>عنوان کالا *</label>
+  <input type="text" id="title" placeholder="مثلاً: شیائومی نوت 14">
 
-  </div>
+  <label>دسته‌بندی *</label>
+  <select id="category">
+    <option value="موبایل">موبایل</option>
+    <option value="لوازم خانگی">لوازم خانگی</option>
+    <option value="سرویس چوب">سرویس چوب</option>
+  </select>
 
-  <script>
-    // رمز عبور پیش‌فرض شما
-    const ADMIN_PASS = '1234';
+  <label>قیمت (تومان) *</label>
+  <input type="number" id="price" placeholder="مثلاً: 25000000">
 
-    const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-    const SUPABASE_ANON_KEY = 'GAPGPTMASKTOKENzfdmbdhckheX1X';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <label>لینک مستقیم تصویر (از uupload یا imgbb) *</label>
+  <input type="text" id="image_url" placeholder="https://...">
 
-    function checkAdminPassword() {
-      const pass = document.getElementById('admin-password').value;
-      if (pass === ADMIN_PASS) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'block';
-      } else {
-        alert('رمز عبور مدیریت اشتباه است!');
-      }
+  <label>توضیحات و مشخصات آگهی</label>
+  <textarea id="description" rows="4" placeholder="توضیحات تکمیلی کالا..."></textarea>
+
+  <button id="submitBtn" onclick="submitProduct()">انتشار آگهی</button>
+  <a href="index.html" class="back-link">← مشاهده فروشگاه</a>
+</div>
+
+<script>
+  // =================== تنظیمات Supabase ===================
+  const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_cnKr9_hRibLAttI-SkKoMA_cIbYIiWv';
+  const ADMIN_PASSWORD = '138989';
+  // ========================================================
+
+  function checkPass() {
+    const input = document.getElementById('adminPass').value;
+    if (input === ADMIN_PASSWORD) {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+    } else {
+      alert('رمز عبور اشتباه است!');
+    }
+  }
+
+  async function submitProduct() {
+    const title = document.getElementById('title').value.trim();
+    const category = document.getElementById('category').value;
+    const price = document.getElementById('price').value.trim();
+    const image_url = document.getElementById('image_url').value.trim();
+    const description = document.getElementById('description').value.trim();
+
+    if (!title || !price || !image_url) {
+      alert('لطفاً عنوان، قیمت و لینک عکس را وارد کنید.');
+      return;
     }
 
-    async function publishAd(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'در حال ثبت در دیتابیس...';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = 'در حال ثبت در دیتابیس...';
 
-      const item = {
-        title: document.getElementById('title').value.trim(),
-        category: document.getElementById('category').value,
-        price: Number(document.getElementById('price').value),
-        image_url: document.getElementById('image_url').value.trim(),
-        description: document.getElementById('desc').value.trim()
-      };
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          title: title,
+          category: category,
+          price: Number(price),
+          image_url: image_url,
+          description: description
+        })
+      });
 
-      try {
-        const { error } = await supabaseClient.from('products').insert([item]);
-        if (error) throw error;
-
-        alert('✅ آگهی با موفقیت ثبت شد و در سایت قرار گرفت!');
-        e.target.reset();
-      } catch (err) {
-        alert('خطا در ثبت: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'انتشار فوری آگهی';
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'خطا در ثبت اطلاعات');
       }
+
+      alert('آگهی با موفقیت در فروشگاه ثبت شد!');
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('image_url').value = '';
+      document.getElementById('description').value = '';
+    } catch (err) {
+      alert('خطا در ثبت: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = 'انتشار آگهی';
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
