@@ -10,7 +10,7 @@
     .card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
     h2 { color: #d4af37; text-align: center; margin-top: 0; }
     label { display: block; margin-top: 15px; font-size: 13px; color: #bbb; }
-    input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; outline: none; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; outline: none; }
     input:focus, textarea:focus { border-color: #d4af37; }
     .file-box { border: 2px dashed #444; padding: 15px; border-radius: 8px; text-align: center; margin-top: 5px; background: #222; }
     .file-box:hover { border-color: #d4af37; }
@@ -38,7 +38,7 @@
     <!-- فرم افزودن محصول -->
     <div id="adminSection">
       <h2>افزودن محصول جدید</h2>
-      
+
       <label>نام کالا:</label>
       <input type="text" id="title" placeholder="مثال: گوشی ردمی نوت 14">
 
@@ -57,7 +57,7 @@
       <input type="text" id="colors" placeholder="مشکی:15000000, طلایی:15500000">
 
       <label>مشخصات فنی (اختیاری - هر کدام در یک خط):</label>
-      <textarea id="specs" rows="3" placeholder="رم 8 گیگابایت&#10;حافظه 256 گیگابایت&#10;باتری 5000 میلی‌آمپر"></textarea>
+      <textarea id="specs" rows="3" placeholder="رم 8 گیگابایت&#10;حافظه 256 گیگابایت"></textarea>
 
       <label>توضیحات کوتاه:</label>
       <textarea id="description" rows="2" placeholder="توضیحات کلی درباره کالا..."></textarea>
@@ -66,16 +66,17 @@
     </div>
   </div>
 
+  <!-- فقط یک بلوک اسکریپت وجود دارد -->
   <script>
-    // اطلاعات دیتابیس Supabase شما
+    // اطلاعات Supabase (فقط یک بار تعریف شده)
     const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMTcwNTUsImV4cCI6MjA1Njc5MzA1NX0.6c0V7v1h8rFm7xK-G0Z5qQoD3S9K3c2hY5q9oG3aL9s'; // کلید anon شما
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_ANON_KEY = 'GAPGPTMASKTOKENpfwqnd59j6iX0X';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // بررسی پسورد
+    // ورود ادمین
     function checkLogin() {
       const pass = document.getElementById('adminPass').value;
-      if (pass === '138989') { // رمز عبور شما
+      if (pass === '138989') {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminSection').style.display = 'block';
       } else {
@@ -83,7 +84,7 @@
       }
     }
 
-    // پیش‌نمایش عکس انتخابی
+    // پیش‌نمایش عکس
     function previewSelectedImage() {
       const fileInput = document.getElementById('imageFile');
       const previewImg = document.getElementById('previewImg');
@@ -97,7 +98,7 @@
       }
     }
 
-    // آپلود عکس و ثبت محصول در دیتابیس
+    // آپلود عکس + ذخیره محصول
     async function saveProduct() {
       const title = document.getElementById('title').value.trim();
       const price = document.getElementById('price').value.trim();
@@ -108,70 +109,42 @@
       const submitBtn = document.getElementById('submitBtn');
       const statusText = document.getElementById('uploadStatus');
 
-      if (!title || !price) {
-        alert('لطفاً عنوان و قیمت کالا را وارد کنید.');
-        return;
-      }
-
-      if (!fileInput.files || fileInput.files.length === 0) {
-        alert('لطفاً یک عکس برای محصول انتخاب کنید.');
-        return;
-      }
+      if (!title || !price) { alert('لطفاً عنوان و قیمت را وارد کنید.'); return; }
+      if (!fileInput.files || fileInput.files.length === 0) { alert('لطفاً یک عکس انتخاب کنید.'); return; }
 
       const file = fileInput.files[0];
       submitBtn.disabled = true;
-      submitBtn.innerText = 'در حال آپلود عکس و ذخیره...';
+      submitBtn.innerText = 'در حال آپلود...';
       statusText.style.display = 'block';
-      statusText.innerText = 'در حال بارگذاری عکس در فضای ابری...';
+      statusText.innerText = 'در حال بارگذاری عکس...';
 
       try {
-        // نام‌گذاری یکتا برای فایل
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+        const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 8) + '.' + fileExt;
 
-        // ۱. آپلود تصویر در باکت product-images
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await sb.storage
           .from('product-images')
-          .upload(fileName, file, { cacheControl: '3600', upsert: false });
+          .upload(fileName, file);
 
-        if (uploadError) {
-          throw new Error('خطا در آپلود عکس: ' + uploadError.message);
-        }
+        if (uploadError) throw new Error('خطا در آپلود عکس: ' + uploadError.message);
 
-        // ۲. ساخت لینک عمومی (Public URL)
-        const { data: publicUrlData } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(fileName);
+        const { data: urlData } = sb.storage.from('product-images').getPublicUrl(fileName);
+        const imageUrl = urlData.publicUrl;
 
-        const imageUrl = publicUrlData.publicUrl;
-
-        // ۳. ثبت اطلاعات در جدول products
-        statusText.innerText = 'در حال ذخیره اطلاعات محصول...';
-        const { error: insertError } = await supabase
+        statusText.innerText = 'در حال ذخیره محصول...';
+        const { error: insertError } = await sb
           .from('products')
-          .insert([
-            {
-              title: title,
-              price: Number(price),
-              image_url: imageUrl,
-              colors: colors || null,
-              specs: specs || null,
-              description: description || null
-            }
-          ]);
+          .insert([{ title: title, price: Number(price), image_url: imageUrl, colors: colors || null, specs: specs || null, description: description || null }]);
 
-        if (insertError) {
-          throw new Error('خطا در ثبت اطلاعات در دیتابیس: ' + insertError.message);
-        }
+        if (insertError) throw new Error('خطا در ذخیره: ' + insertError.message);
 
-        alert('✅ محصول با موفقیت و همراه با عکس ثبت شد!');
-        // خالی کردن فیلدها
+        alert('✅ محصول با موفقیت ثبت شد!');
         document.getElementById('title').value = '';
         document.getElementById('price').value = '';
-        document.getElementById('imageFile').value = '';
         document.getElementById('colors').value = '';
         document.getElementById('specs').value = '';
         document.getElementById('description').value = '';
+        document.getElementById('imageFile').value = '';
         document.getElementById('previewImg').style.display = 'none';
         statusText.style.display = 'none';
 
