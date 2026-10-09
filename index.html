@@ -125,6 +125,7 @@ header{background:#fff;position:sticky;top:0;z-index:50;border-bottom:1px solid 
 .feats{display:grid;grid-template-columns:1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .feats .row{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:11px 14px;font-size:13.5px;align-items:center}
 .feats .row:nth-child(odd){background:#fafafb}
+.feats .row.one{grid-template-columns:1fr}
 .feats dt{color:var(--muted);display:flex;gap:8px;align-items:center}
 .feats dd{font-weight:600;line-height:1.8}
 .store-note{background:#fff;border:1px dashed var(--red);color:var(--red-dark);border-radius:10px;padding:12px;font-size:13px;font-weight:700;text-align:center;margin-bottom:10px}
@@ -234,6 +235,8 @@ footer b{display:block;color:var(--red);font-size:18px;margin-bottom:6px}
       <div class="sec hide" id="colors-sec"><h3>رنگ: <span id="d-colorname"></span></h3><div class="swatches" id="d-colors"></div></div>
       <div class="sec hide" id="feat-sec"><h3>ویژگی‌ها</h3><dl class="feats" id="d-feats"></dl></div>
       <div class="sec"><h3>توضیحات</h3><p class="desc" id="d-desc"></p></div>
+      <div id="d-more"></div>
+      <pre class="hide" id="d-debug" style="direction:ltr;text-align:left;background:#111;color:#9f9;font-size:11px;padding:12px;border-radius:10px;overflow:auto;margin-top:16px;white-space:pre-wrap"></pre>
     </div>
     <aside class="buy">
       <h4>فروشنده</h4>
@@ -265,10 +268,12 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
 const CATS=[
   {n:'همه',i:'🛍️',l:'همه کالاها'},
-  {n:'موبایل',i:'📱',l:'موبایل'},
+  {n:'گوشی',i:'📱',l:'موبایل'},
   {n:'لوازم خانگی',i:'🏠',l:'لوازم خانگی'},
-  {n:'سرویس چوب',i:'🛋️',l:'سرویس چوب'}
+  {n:'مبلمان',i:'🛋️',l:'سرویس چوب'}
 ];
+const ALIAS={'موبایل':'گوشی','سرویس چوب':'مبلمان'};
+const norm=c=>{c=(c||'').trim();return ALIAS[c]||c};
 const FALLBACK='https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600';
 
 let all=[],cat='همه',sortBy='new',query='';
@@ -317,7 +322,7 @@ function cardHTML(p){
 
 let shown=[];
 function render(){
-  let list=all.filter(p=>cat==='همه'||(p.category||'').trim()===cat);
+  let list=all.filter(p=>cat==='همه'||norm(p.category)===cat);
   if(query){const q=query.toLowerCase();list=list.filter(p=>(p.title||'').toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q))}
   if(sortBy==='cheap')list=[...list].sort((a,b)=>(a.price||Infinity)-(b.price||Infinity));
   if(sortBy==='exp')list=[...list].sort((a,b)=>(b.price||0)-(a.price||0));
@@ -364,7 +369,7 @@ function parseSpecs(p){
   if(typeof v==='string'){try{v=JSON.parse(v)}catch(e){}}
   if(Array.isArray(v))return v.map(x=>[x.name||x.key||'',x.value||'']).filter(x=>x[0]);
   if(v&&typeof v==='object')return Object.entries(v);
-  return String(v).split('\n').map(l=>{const i=l.indexOf(':');return i>0?[l.slice(0,i).trim(),l.slice(i+1).trim()]:null}).filter(Boolean);
+  return String(v).split('\n').map(l=>{const i=l.indexOf(':');if(i>0)return[l.slice(0,i).trim(),l.slice(i+1).trim()];const t=l.trim();return t?[t,'']:null}).filter(Boolean);
 }
 const ICONS=[['باتری','🔋'],['دوربین','📷'],['رم','🧠'],['حافظه','💾'],['صفحه','📺'],['نمایشگر','📺'],['پردازنده','⚙️'],['سیم','📶'],['وزن','⚖️'],['ظرفیت','📦'],['توان','⚡'],['ابعاد','📐'],['جنس','🪵'],['گارانتی','🛡️']];
 const icon=k=>(ICONS.find(i=>k.includes(i[0]))||['','▪️'])[1];
@@ -395,8 +400,13 @@ function showProduct(p){
   }
   const sp=parseSpecs(p);
   $('feat-sec').classList.toggle('hide',!sp.length);
-  $('d-feats').innerHTML=sp.map(([k,v])=>`<div class="row"><dt>${icon(k)} ${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+  $('d-feats').innerHTML=sp.map(([k,v])=>v?`<div class="row"><dt>${icon(k)} ${esc(k)}</dt><dd>${esc(v)}</dd></div>`:`<div class="row one"><dd>✓ ${esc(k)}</dd></div>`).join('');
   $('d-desc').textContent=p.description||'توضیحی ثبت نشده است.';
+  const KNOWN=['id','title','price','old_price','category','image_url','description','colors','specs','created_at','updated_at'];
+  const extra=Object.entries(p).filter(([k,v])=>!KNOWN.includes(k)&&typeof v==='string'&&v.trim().length>3&&!/^https?:\/\//i.test(v.trim()));
+  $('d-more').innerHTML=extra.map(([k,v])=>`<div class="sec"><h3>${esc(k.replace(/_/g,' '))}</h3><p class="desc">${esc(v)}</p></div>`).join('');
+  const dbg=$('d-debug');dbg.classList.toggle('hide',!/[?&]debug/.test(location.search));
+  if(!dbg.classList.contains('hide'))dbg.textContent=JSON.stringify(p,null,2);
   renderPrice(p,p.price);
   renderAction(p);
   const sim=all.filter(x=>x.id!==p.id&&(x.category||'')===(p.category||'')).slice(0,5);
@@ -404,7 +414,7 @@ function showProduct(p){
   $('similar').innerHTML=sim.map(cardHTML).join('');
   scrollTo(0,0);
 }
-function goCat(c){cat=CATS.some(x=>x.n===c)?c:'همه';location.hash='';buildNav();render()}
+function goCat(c){cat=CATS.some(x=>x.n===norm(c))?norm(c):'همه';location.hash='';buildNav();render()}
 function route(){
   const m=location.hash.match(/^#p-(.+)$/);
   const p=m&&all.find(x=>String(x.id)===m[1]);
@@ -455,7 +465,7 @@ function openCmp(){
     ${row('قیمت',p=>p.price?`<b>${fmt(p.price)}</b> تومان`:'توافقی')}
     ${row('دسته‌بندی',p=>esc(p.category||'متفرقه'))}
     ${row('رنگ‌ها',p=>parseColors(p).map(c=>`<span style="white-space:nowrap"><i class="dot" style="background:${esc(c.hex)}"></i>${esc(c.name)}${c.price&&c.price!=p.price?` <small style="color:#81858b">(${fmt(c.price)})</small>`:''}</span>`).join(' ')||'—')}
-    ${keys.map(k=>row(`${icon(k)} ${esc(k)}`,(p,i)=>{const f=specs[i].find(x=>x[0]===k);return f?esc(f[1]):'—'})).join('')}
+    ${keys.map(k=>row(`${icon(k)} ${esc(k)}`,(p,i)=>{const f=specs[i].find(x=>x[0]===k);return f?(f[1]?esc(f[1]):'✓'):'—'})).join('')}
   </table>`;
   $('cmp').classList.add('open');
 }
