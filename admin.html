@@ -10,8 +10,8 @@
     .card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
     h2 { color: #d4af37; text-align: center; margin-top: 0; }
     label { display: block; margin-top: 15px; font-size: 13px; color: #bbb; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; outline: none; }
-    input:focus, textarea:focus { border-color: #d4af37; }
+    input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: #d4af37; }
     .file-box { border: 2px dashed #444; padding: 15px; border-radius: 8px; text-align: center; margin-top: 5px; background: #222; }
     .file-box:hover { border-color: #d4af37; }
     #previewImg { max-width: 100%; max-height: 160px; margin-top: 10px; border-radius: 6px; display: none; }
@@ -27,7 +27,7 @@
 <body>
 
   <div class="card">
-    <!-- بخش لاگین -->
+    <!-- بخش ورود -->
     <div id="loginSection">
       <h2>ورود به پنل مجلل</h2>
       <label>رمز عبور ادمین:</label>
@@ -40,10 +40,17 @@
       <h2>افزودن محصول جدید</h2>
 
       <label>نام کالا:</label>
-      <input type="text" id="title" placeholder="مثال: گوشی ردمی نوت 14">
+      <input type="text" id="title" placeholder="مثال: گوشی نوت 14">
+
+      <label>دسته‌بندی کالا:</label>
+      <select id="category">
+        <option value="گوشی">گوشی و موبایل</option>
+        <option value="لوازم خانگی">لوازم خانگی</option>
+        <option value="مبلمان">مبلمان و سرویس چوب</option>
+      </select>
 
       <label>قیمت پایه (تومان):</label>
-      <input type="number" id="price" placeholder="مثال: 15000000">
+      <input type="number" id="price" placeholder="مثال: 85000000">
 
       <label>انتخاب عکس محصول:</label>
       <div class="file-box">
@@ -54,10 +61,10 @@
       <div class="hint">عکس مستقیماً از گوشی یا سیستم شما بارگذاری می‌شود.</div>
 
       <label>رنگ‌ها و قیمت‌ها (اختیاری):</label>
-      <input type="text" id="colors" placeholder="مشکی:15000000, طلایی:15500000">
+      <input type="text" id="colors" placeholder="سبز:85000000, مشکی:85500000">
 
       <label>مشخصات فنی (اختیاری - هر کدام در یک خط):</label>
-      <textarea id="specs" rows="3" placeholder="رم 8 گیگابایت&#10;حافظه 256 گیگابایت"></textarea>
+      <textarea id="specs" rows="3" placeholder="کابل USB Type-C&#10;آداپتور فست شارژ&#10;اثر انگشت زیر نمایشگر"></textarea>
 
       <label>توضیحات کوتاه:</label>
       <textarea id="description" rows="2" placeholder="توضیحات کلی درباره کالا..."></textarea>
@@ -66,14 +73,12 @@
     </div>
   </div>
 
-  <!-- فقط یک بلوک اسکریپت وجود دارد -->
   <script>
-    // اطلاعات Supabase (فقط یک بار تعریف شده)
     const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
+    // کلید عمومی anon شما
+    const SUPABASE_ANON_KEY = 'GAPGPTMASKTOKENeil1w20dzxvX0X';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ورود ادمین
     function checkLogin() {
       const pass = document.getElementById('adminPass').value;
       if (pass === '138989') {
@@ -84,7 +89,6 @@
       }
     }
 
-    // پیش‌نمایش عکس
     function previewSelectedImage() {
       const fileInput = document.getElementById('imageFile');
       const previewImg = document.getElementById('previewImg');
@@ -98,9 +102,9 @@
       }
     }
 
-    // آپلود عکس + ذخیره محصول
     async function saveProduct() {
       const title = document.getElementById('title').value.trim();
+      const category = document.getElementById('category').value;
       const price = document.getElementById('price').value.trim();
       const fileInput = document.getElementById('imageFile');
       const colors = document.getElementById('colors').value.trim();
@@ -109,36 +113,57 @@
       const submitBtn = document.getElementById('submitBtn');
       const statusText = document.getElementById('uploadStatus');
 
-      if (!title || !price) { alert('لطفاً عنوان و قیمت را وارد کنید.'); return; }
-      if (!fileInput.files || fileInput.files.length === 0) { alert('لطفاً یک عکس انتخاب کنید.'); return; }
+      if (!title || !price) {
+        alert('لطفاً نام کالا و قیمت را بنویسید.');
+        return;
+      }
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('لطفاً یک عکس انتخاب کنید.');
+        return;
+      }
 
       const file = fileInput.files[0];
       submitBtn.disabled = true;
-      submitBtn.innerText = 'در حال آپلود...';
+      submitBtn.innerText = 'در حال ذخیره‌سازی...';
       statusText.style.display = 'block';
-      statusText.innerText = 'در حال بارگذاری عکس...';
+      statusText.innerText = 'در حال آپلود عکس...';
 
       try {
         const fileExt = file.name.split('.').pop();
-        const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 8) + '.' + fileExt;
+        const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.' + fileExt;
 
+        // ۱. آپلود تصویر در استوریج
         const { error: uploadError } = await sb.storage
           .from('product-images')
           .upload(fileName, file);
 
         if (uploadError) throw new Error('خطا در آپلود عکس: ' + uploadError.message);
 
+        // ۲. ساخت لینک عکس
         const { data: urlData } = sb.storage.from('product-images').getPublicUrl(fileName);
         const imageUrl = urlData.publicUrl;
 
-        statusText.innerText = 'در حال ذخیره محصول...';
+        // ۳. ثبت در جدول محصولات
+        statusText.innerText = 'در حال ثبت در دیتابیس...';
         const { error: insertError } = await sb
           .from('products')
-          .insert([{ title: title, price: Number(price), image_url: imageUrl, colors: colors || null, specs: specs || null, description: description || null }]);
+          .insert([
+            {
+              title: title,
+              category: category,
+              price: Number(price),
+              image_url: imageUrl,
+              colors: colors || null,
+              specs: specs || null,
+              description: description || null
+            }
+          ]);
 
         if (insertError) throw new Error('خطا در ذخیره: ' + insertError.message);
 
         alert('✅ محصول با موفقیت ثبت شد!');
+
+        // پاک کردن فرم بعد از ثبت موفق
         document.getElementById('title').value = '';
         document.getElementById('price').value = '';
         document.getElementById('colors').value = '';
