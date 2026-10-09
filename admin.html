@@ -1,249 +1,187 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل مدیریت فروشگاه مجلل</title>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-gold: #fbbf24;
-            --text-color: #f8fafc;
-            --border-color: #334155;
-        }
-
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .admin-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 25px;
-            width: 100%;
-            max-width: 520px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        h2 {
-            color: var(--accent-gold);
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 11px;
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: #fff;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-        }
-
-        .hint {
-            font-size: 0.78rem;
-            color: #94a3b8;
-            margin-top: 5px;
-            display: block;
-            line-height: 1.5;
-        }
-
-        .hint-badge {
-            display: inline-block;
-            background: #334155;
-            color: #f8fafc;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            direction: ltr;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-gold);
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #f59e0b;
-        }
-
-        #login-section {
-            text-align: center;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>پنل مدیریت فروشگاه مجلل</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; font-family: Tahoma, sans-serif; }
+    body { background-color: #121212; color: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+    .card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    h2 { color: #d4af37; text-align: center; margin-top: 0; }
+    label { display: block; margin-top: 15px; font-size: 13px; color: #bbb; }
+    input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; outline: none; }
+    input:focus, textarea:focus { border-color: #d4af37; }
+    .file-box { border: 2px dashed #444; padding: 15px; border-radius: 8px; text-align: center; margin-top: 5px; background: #222; }
+    .file-box:hover { border-color: #d4af37; }
+    #previewImg { max-width: 100%; max-height: 160px; margin-top: 10px; border-radius: 6px; display: none; }
+    button { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 6px; background: #d4af37; color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 15px; }
+    button:hover { background: #e5c158; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; }
+    #loginSection { display: block; }
+    #adminSection { display: none; }
+    .hint { font-size: 11px; color: #777; margin-top: 4px; }
+    #uploadStatus { font-size: 12px; color: #d4af37; margin-top: 6px; display: none; }
+  </style>
 </head>
 <body>
 
-    <div class="admin-card">
-        <!-- ورود ادمین -->
-        <div id="login-section">
-            <h2>ورود مدیریت مجلل</h2>
-            <div class="form-group">
-                <input type="password" id="admin-pass" placeholder="رمز عبور مدیریت را وارد کنید">
-            </div>
-            <button onclick="checkLogin()">ورود به پنل</button>
-        </div>
-
-        <!-- ثبت محصول -->
-        <div id="dashboard-section" class="hidden">
-            <h2>ثبت محصول جدید</h2>
-            
-            <div class="form-group">
-                <label>نام کالا (عنوان):</label>
-                <input type="text" id="title" placeholder="مثال: گوشی شیائومی ردمی نوت 14">
-            </div>
-
-            <div class="form-group">
-                <label>قیمت پیش‌فرض (تومان):</label>
-                <input type="number" id="price" placeholder="مثال: 15000000">
-            </div>
-
-            <div class="form-group">
-                <label>لینک مستقیم تصویر:</label>
-                <input type="text" id="image_url" placeholder="https://example.com/photo.jpg">
-            </div>
-
-            <div class="form-group">
-                <label>رنگ‌ها و قیمت‌ها (با ویرگول جدا کنید):</label>
-                <input type="text" id="colors" placeholder="مشکی:15000000, نقره‌ای:15300000, طلایی:15500000">
-                <span class="hint">
-                    💡 می‌توانید قیمت اختصاصی هر رنگ را جلویش با <span class="hint-badge">:</span> بنویسید:<br>
-                    <span class="hint-badge">مشکی:15000000, نقره‌ای:15500000</span><br>
-                    (اگر قیمت ننویسید، همان قیمت پیش‌فرض محصول لحاظ می‌شود).
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label>مشخصات فنی (هر کدام در یک سطر):</label>
-                <textarea id="specs" rows="4" placeholder="باتری: ۵۰۰۰ میلی‌آمپر ساعت&#10;دوربین: ۵۰ مگاپیکسل&#10;رم: ۸ گیگابایت&#10;حافظه: ۲۵۶ گیگابایت"></textarea>
-                <span class="hint">نکته: هر ویژگی در یک خط با علامت دو نقطه (:) نوشته شود.</span>
-            </div>
-
-            <div class="form-group">
-                <label>توضیحات کلی محصول:</label>
-                <textarea id="description" rows="3" placeholder="توضیحات و امکانات محصول..."></textarea>
-            </div>
-
-            <button onclick="submitProduct()" id="submit-btn">ثبت در فروشگاه</button>
-        </div>
+  <div class="card">
+    <!-- بخش لاگین -->
+    <div id="loginSection">
+      <h2>ورود به پنل مجلل</h2>
+      <label>رمز عبور ادمین:</label>
+      <input type="password" id="adminPass" placeholder="رمز را وارد کنید">
+      <button onclick="checkLogin()">ورود</button>
     </div>
 
-    <!-- کتابخانه Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-        const SUPABASE_KEY = 'GAPGPTMASKTOKENym8q6rl0mpeX1X';
-        
-        let supabaseClient;
-        try {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (e) {
-            console.error("خطا در راه‌اندازی سوپابیس", e);
+    <!-- فرم افزودن محصول -->
+    <div id="adminSection">
+      <h2>افزودن محصول جدید</h2>
+      
+      <label>نام کالا:</label>
+      <input type="text" id="title" placeholder="مثال: گوشی ردمی نوت 14">
+
+      <label>قیمت پایه (تومان):</label>
+      <input type="number" id="price" placeholder="مثال: 15000000">
+
+      <label>انتخاب عکس محصول:</label>
+      <div class="file-box">
+        <input type="file" id="imageFile" accept="image/*" onchange="previewSelectedImage()">
+        <img id="previewImg" alt="پیش‌نمایش عکس">
+        <div id="uploadStatus">در حال آماده‌سازی عکس...</div>
+      </div>
+      <div class="hint">عکس مستقیماً از گوشی یا سیستم شما بارگذاری می‌شود.</div>
+
+      <label>رنگ‌ها و قیمت‌ها (اختیاری):</label>
+      <input type="text" id="colors" placeholder="مشکی:15000000, طلایی:15500000">
+
+      <label>مشخصات فنی (اختیاری - هر کدام در یک خط):</label>
+      <textarea id="specs" rows="3" placeholder="رم 8 گیگابایت&#10;حافظه 256 گیگابایت&#10;باتری 5000 میلی‌آمپر"></textarea>
+
+      <label>توضیحات کوتاه:</label>
+      <textarea id="description" rows="2" placeholder="توضیحات کلی درباره کالا..."></textarea>
+
+      <button id="submitBtn" onclick="saveProduct()">ثبت نهایی محصول</button>
+    </div>
+  </div>
+
+  <script>
+    // اطلاعات دیتابیس Supabase شما
+    const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMTcwNTUsImV4cCI6MjA1Njc5MzA1NX0.6c0V7v1h8rFm7xK-G0Z5qQoD3S9K3c2hY5q9oG3aL9s'; // کلید anon شما
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // بررسی پسورد
+    function checkLogin() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === '138989') { // رمز عبور شما
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminSection').style.display = 'block';
+      } else {
+        alert('رمز عبور اشتباه است!');
+      }
+    }
+
+    // پیش‌نمایش عکس انتخابی
+    function previewSelectedImage() {
+      const fileInput = document.getElementById('imageFile');
+      const previewImg = document.getElementById('previewImg');
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+    }
+
+    // آپلود عکس و ثبت محصول در دیتابیس
+    async function saveProduct() {
+      const title = document.getElementById('title').value.trim();
+      const price = document.getElementById('price').value.trim();
+      const fileInput = document.getElementById('imageFile');
+      const colors = document.getElementById('colors').value.trim();
+      const specs = document.getElementById('specs').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+      const statusText = document.getElementById('uploadStatus');
+
+      if (!title || !price) {
+        alert('لطفاً عنوان و قیمت کالا را وارد کنید.');
+        return;
+      }
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('لطفاً یک عکس برای محصول انتخاب کنید.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'در حال آپلود عکس و ذخیره...';
+      statusText.style.display = 'block';
+      statusText.innerText = 'در حال بارگذاری عکس در فضای ابری...';
+
+      try {
+        // نام‌گذاری یکتا برای فایل
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+
+        // ۱. آپلود تصویر در باکت product-images
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) {
+          throw new Error('خطا در آپلود عکس: ' + uploadError.message);
         }
 
-        function checkLogin() {
-            const pass = document.getElementById('admin-pass').value;
-            if (pass === '138989') {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('dashboard-section').classList.remove('hidden');
-            } else {
-                alert('رمز عبور اشتباه است!');
+        // ۲. ساخت لینک عمومی (Public URL)
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        const imageUrl = publicUrlData.publicUrl;
+
+        // ۳. ثبت اطلاعات در جدول products
+        statusText.innerText = 'در حال ذخیره اطلاعات محصول...';
+        const { error: insertError } = await supabase
+          .from('products')
+          .insert([
+            {
+              title: title,
+              price: Number(price),
+              image_url: imageUrl,
+              colors: colors || null,
+              specs: specs || null,
+              description: description || null
             }
+          ]);
+
+        if (insertError) {
+          throw new Error('خطا در ثبت اطلاعات در دیتابیس: ' + insertError.message);
         }
 
-        async function submitProduct() {
-            const title = document.getElementById('title').value.trim();
-            const price = document.getElementById('price').value;
-            const image_url = document.getElementById('image_url').value.trim();
-            const colors = document.getElementById('colors').value.trim();
-            const specs = document.getElementById('specs').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const btn = document.getElementById('submit-btn');
+        alert('✅ محصول با موفقیت و همراه با عکس ثبت شد!');
+        // خالی کردن فیلدها
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('imageFile').value = '';
+        document.getElementById('colors').value = '';
+        document.getElementById('specs').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('previewImg').style.display = 'none';
+        statusText.style.display = 'none';
 
-            if (!title || !price || !image_url) {
-                alert('لطفاً عنوان، قیمت و عکس را حتماً وارد کنید.');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = 'در حال ثبت...';
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('products')
-                    .insert([
-                        {
-                            title: title,
-                            price: parseInt(price),
-                            image_url: image_url,
-                            colors: colors || null,
-                            specs: specs || null,
-                            description: description || null
-                        }
-                    ]);
-
-                if (error) {
-                    alert('خطا در ثبت: ' + error.message);
-                } else {
-                    alert('محصول با موفقیت همراه با رنگ‌ها و قیمت‌های متغیر ثبت شد!');
-                    document.getElementById('title').value = '';
-                    document.getElementById('price').value = '';
-                    document.getElementById('image_url').value = '';
-                    document.getElementById('colors').value = '';
-                    document.getElementById('specs').value = '';
-                    document.getElementById('description').value = '';
-                }
-            } catch (err) {
-                alert('خطای اتصال: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'ثبت در فروشگاه';
-            }
-        }
-    </script>
+      } catch (err) {
+        alert('❌ ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'ثبت نهایی محصول';
+      }
+    }
+  </script>
 </body>
 </html>
