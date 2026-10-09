@@ -1,186 +1,249 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل مدیریت فروشگاه مجلل</title>
-  <style>
-    body {
-      background-color: #0f1115;
-      color: #f1f1f1;
-      font-family: Tahoma, sans-serif;
-      margin: 0;
-      padding: 20px;
-      direction: rtl;
-    }
-    .container {
-      max-width: 520px;
-      margin: 20px auto;
-      background: #181b20;
-      padding: 25px;
-      border-radius: 14px;
-      border: 1px solid #2a2e39;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    h2 {
-      text-align: center;
-      color: #dfb15b;
-      margin-top: 0;
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      margin: 12px 0 6px;
-      color: #aaa;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #333946;
-      background: #0f1115;
-      color: #fff;
-      box-sizing: border-box;
-      font-size: 14px;
-      outline: none;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: #dfb15b;
-    }
-    button {
-      width: 100%;
-      background: #dfb15b;
-      color: #111;
-      border: none;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #f1c26b;
-    }
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #888;
-      text-decoration: none;
-      font-size: 13px;
-    }
-    .back-link:hover {
-      color: #dfb15b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت فروشگاه مجلل</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-gold: #fbbf24;
+            --text-color: #f8fafc;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .admin-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: var(--accent-gold);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 11px;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        .hint {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: block;
+            line-height: 1.5;
+        }
+
+        .hint-badge {
+            display: inline-block;
+            background: #334155;
+            color: #f8fafc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            direction: ltr;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #f59e0b;
+        }
+
+        #login-section {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container" id="loginBox">
-  <h2>ورود به پنل مدیریت</h2>
-  <label>رمز عبور ادمین:</label>
-  <input type="password" id="adminPass" placeholder="رمز را وارد کنید...">
-  <button onclick="checkPass()">ورود</button>
-</div>
+    <div class="admin-card">
+        <!-- ورود ادمین -->
+        <div id="login-section">
+            <h2>ورود مدیریت مجلل</h2>
+            <div class="form-group">
+                <input type="password" id="admin-pass" placeholder="رمز عبور مدیریت را وارد کنید">
+            </div>
+            <button onclick="checkLogin()">ورود به پنل</button>
+        </div>
 
-<div class="container" id="adminPanel" style="display: none;">
-  <h2>ثبت آگهی جدید</h2>
-  
-  <label>عنوان کالا *</label>
-  <input type="text" id="title" placeholder="مثلاً: شیائومی نوت 14">
+        <!-- ثبت محصول -->
+        <div id="dashboard-section" class="hidden">
+            <h2>ثبت محصول جدید</h2>
+            
+            <div class="form-group">
+                <label>نام کالا (عنوان):</label>
+                <input type="text" id="title" placeholder="مثال: گوشی شیائومی ردمی نوت 14">
+            </div>
 
-  <label>دسته‌بندی *</label>
-  <select id="category">
-    <option value="موبایل">موبایل</option>
-    <option value="لوازم خانگی">لوازم خانگی</option>
-    <option value="سرویس چوب">سرویس چوب</option>
-  </select>
+            <div class="form-group">
+                <label>قیمت پیش‌فرض (تومان):</label>
+                <input type="number" id="price" placeholder="مثال: 15000000">
+            </div>
 
-  <label>قیمت (تومان) *</label>
-  <input type="number" id="price" placeholder="مثلاً: 25000000">
+            <div class="form-group">
+                <label>لینک مستقیم تصویر:</label>
+                <input type="text" id="image_url" placeholder="https://example.com/photo.jpg">
+            </div>
 
-  <label>لینک مستقیم تصویر (از uupload یا imgbb) *</label>
-  <input type="text" id="image_url" placeholder="https://...">
+            <div class="form-group">
+                <label>رنگ‌ها و قیمت‌ها (با ویرگول جدا کنید):</label>
+                <input type="text" id="colors" placeholder="مشکی:15000000, نقره‌ای:15300000, طلایی:15500000">
+                <span class="hint">
+                    💡 می‌توانید قیمت اختصاصی هر رنگ را جلویش با <span class="hint-badge">:</span> بنویسید:<br>
+                    <span class="hint-badge">مشکی:15000000, نقره‌ای:15500000</span><br>
+                    (اگر قیمت ننویسید، همان قیمت پیش‌فرض محصول لحاظ می‌شود).
+                </span>
+            </div>
 
-  <label>توضیحات و مشخصات آگهی</label>
-  <textarea id="description" rows="4" placeholder="توضیحات تکمیلی کالا..."></textarea>
+            <div class="form-group">
+                <label>مشخصات فنی (هر کدام در یک سطر):</label>
+                <textarea id="specs" rows="4" placeholder="باتری: ۵۰۰۰ میلی‌آمپر ساعت&#10;دوربین: ۵۰ مگاپیکسل&#10;رم: ۸ گیگابایت&#10;حافظه: ۲۵۶ گیگابایت"></textarea>
+                <span class="hint">نکته: هر ویژگی در یک خط با علامت دو نقطه (:) نوشته شود.</span>
+            </div>
 
-  <button id="submitBtn" onclick="submitProduct()">انتشار آگهی</button>
-  <a href="index.html" class="back-link">← مشاهده فروشگاه</a>
-</div>
+            <div class="form-group">
+                <label>توضیحات کلی محصول:</label>
+                <textarea id="description" rows="3" placeholder="توضیحات و امکانات محصول..."></textarea>
+            </div>
 
-<script>
-  // =================== تنظیمات Supabase ===================
-  const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_cnKr9_hRibLAttI-SkKoMA_cIbYIiWv';
-  const ADMIN_PASSWORD = '138989';
-  // ========================================================
+            <button onclick="submitProduct()" id="submit-btn">ثبت در فروشگاه</button>
+        </div>
+    </div>
 
-  function checkPass() {
-    const input = document.getElementById('adminPass').value;
-    if (input === ADMIN_PASSWORD) {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-    } else {
-      alert('رمز عبور اشتباه است!');
-    }
-  }
+    <!-- کتابخانه Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
+        const SUPABASE_KEY = 'GAPGPTMASKTOKENym8q6rl0mpeX1X';
+        
+        let supabaseClient;
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error("خطا در راه‌اندازی سوپابیس", e);
+        }
 
-  async function submitProduct() {
-    const title = document.getElementById('title').value.trim();
-    const category = document.getElementById('category').value;
-    const price = document.getElementById('price').value.trim();
-    const image_url = document.getElementById('image_url').value.trim();
-    const description = document.getElementById('description').value.trim();
+        function checkLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'GAPGPTMASKTOKENym8q6rl0mpeX2X') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+            } else {
+                alert('رمز عبور اشتباه است!');
+            }
+        }
 
-    if (!title || !price || !image_url) {
-      alert('لطفاً عنوان، قیمت و لینک عکس را وارد کنید.');
-      return;
-    }
+        async function submitProduct() {
+            const title = document.getElementById('title').value.trim();
+            const price = document.getElementById('price').value;
+            const image_url = document.getElementById('image_url').value.trim();
+            const colors = document.getElementById('colors').value.trim();
+            const specs = document.getElementById('specs').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const btn = document.getElementById('submit-btn');
 
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerText = 'در حال ثبت در دیتابیس...';
+            if (!title || !price || !image_url) {
+                alert('لطفاً عنوان، قیمت و عکس را حتماً وارد کنید.');
+                return;
+            }
 
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          title: title,
-          category: category,
-          price: Number(price),
-          image_url: image_url,
-          description: description
-        })
-      });
+            btn.disabled = true;
+            btn.innerText = 'در حال ثبت...';
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'خطا در ثبت اطلاعات');
-      }
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .insert([
+                        {
+                            title: title,
+                            price: parseInt(price),
+                            image_url: image_url,
+                            colors: colors || null,
+                            specs: specs || null,
+                            description: description || null
+                        }
+                    ]);
 
-      alert('آگهی با موفقیت در فروشگاه ثبت شد!');
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image_url').value = '';
-      document.getElementById('description').value = '';
-    } catch (err) {
-      alert('خطا در ثبت: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = 'انتشار آگهی';
-    }
-  }
-</script>
-
+                if (error) {
+                    alert('خطا در ثبت: ' + error.message);
+                } else {
+                    alert('محصول با موفقیت همراه با رنگ‌ها و قیمت‌های متغیر ثبت شد!');
+                    document.getElementById('title').value = '';
+                    document.getElementById('price').value = '';
+                    document.getElementById('image_url').value = '';
+                    document.getElementById('colors').value = '';
+                    document.getElementById('specs').value = '';
+                    document.getElementById('description').value = '';
+                }
+            } catch (err) {
+                alert('خطای اتصال: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'ثبت در فروشگاه';
+            }
+        }
+    </script>
 </body>
 </html>
