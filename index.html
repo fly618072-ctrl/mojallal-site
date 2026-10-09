@@ -4,90 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فروشگاه مجلل</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* استایل‌های اصلی شما حفظ شده */
-        body { font-family: Tahoma, Arial, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .color-circle { width: 30px; height: 30px; border-radius: 50%; display: inline-block; margin: 5px; border: 2px solid #555; transition: transform 0.2s; }
-        .color-circle.active { border-color: #fff; transform: scale(1.2); }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-        .modal-content { background: #222; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; }
+        :root { --red: #ef394e; --text: #23254e; --bg: #f1f2f4; }
+        body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-5px); }
+        img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; max-width: 500px; width: 90%; }
+        .color-btn { border: 1px solid #ccc; padding: 5px 10px; margin: 5px; cursor: pointer; border-radius: 5px; }
+        .color-btn.active { border-color: var(--red); background: #ffebee; }
+        .price-tag { font-weight: bold; color: var(--red); font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div id="product-grid" class="product-grid"></div>
+    <h1 style="text-align: center;">فروشگاه مجلل</h1>
+    <div id="products-grid" class="grid"></div>
 
-    <div id="product-modal" class="modal">
-        <div class="modal-content">
-            <h2 id="modal-title"></h2>
-            <img id="modal-image" src="" style="width:100%; height:auto;">
-            <p id="modal-description"></p>
-            <div id="color-container"></div>
-            <h3 id="modal-price"></h3>
-            <button onclick="document.getElementById('product-modal').style.display='none'">بستن</button>
+    <!-- Modal -->
+    <div id="productModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="modalTitle"></h2>
+            <img id="modalImg" src="" style="height: 250px;">
+            <p id="modalDesc"></p>
+            <div id="modalColors"></div>
+            <p class="price-tag">قیمت: <span id="modalPrice"></span> تومان</p>
+            <button onclick="closeModal()">بستن</button>
         </div>
     </div>
 
     <script>
-        // === تنظیمات سوپابیس (اینجا را با کلیدهای خودتان پر کنید) ===
-        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // تنظیمات Supabase - این قسمت را با مقادیر خود پر کنید
+        const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co/rest/v1/';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function loadProducts() {
-            const { data, error } = await client.from('products').select('*');
+        async function fetchProducts() {
+            const { data, error } = await supabase.from('products').select('*');
             if (error) { console.error(error); return; }
-            const grid = document.getElementById('product-grid');
-            data.forEach(product => {
-                const card = document.createElement('div');
-                card.innerHTML = `<h3>${product.title}</h3><button onclick='openDetails(${JSON.stringify(product)})'>مشاهده</button>`;
-                grid.appendChild(card);
+            
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = data.map(p => `
+                <div class="card" onclick="showProduct(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                    <img src="${p.image_url}" alt="${p.title}">
+                    <h3>${p.title}</h3>
+                    <p>${p.price.toLocaleString('fa-IR')} تومان</p>
+                </div>
+            `).join('');
+        }
+
+        function parseColors(colorsStr) {
+            if (!colorsStr) return [];
+            return colorsStr.split(',').map(item => {
+                const [name, price] = item.split(':');
+                return { name: name.trim(), price: parseInt(price.trim()) };
             });
         }
 
-        function openDetails(product) {
-            document.getElementById('modal-title').innerText = product.title;
-            document.getElementById('modal-image').src = product.image_url;
-            document.getElementById('modal-description').innerText = product.description || '';
+        function showProduct(product) {
+            document.getElementById('modalTitle').innerText = product.title;
+            document.getElementById('modalImg').src = product.image_url;
+            document.getElementById('modalDesc').innerText = product.description || '';
             
-            const colorContainer = document.getElementById('color-container');
-            const priceDisplay = document.getElementById('modal-price');
+            const colorContainer = document.getElementById('modalColors');
             colorContainer.innerHTML = '';
-
-            // نمایش رنگ‌ها و قیمت‌ها
-            if (product.colors) {
-                const colorList = product.colors.split(',').map(s => s.trim()).filter(Boolean);
-                colorList.forEach((item, index) => {
-                    const [cName, cPrice] = item.split(':').map(s => s ? s.trim() : '');
-                    const finalPrice = cPrice || product.price;
-
-                    const circle = document.createElement('div');
-                    circle.className = 'color-circle';
-                    circle.style.backgroundColor = cName.includes('مشکی') ? '#000' : '#777';
-                    
-                    if (index === 0) {
-                        circle.classList.add('active');
-                        priceDisplay.innerText = Number(finalPrice).toLocaleString('fa-IR') + ' تومان';
-                    }
-
-                    circle.onclick = function() {
-                        document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
-                        circle.classList.add('active');
-                        priceDisplay.innerText = Number(finalPrice).toLocaleString('fa-IR') + ' تومان';
+            
+            const variants = parseColors(product.colors);
+            
+            if (variants.length > 0) {
+                variants.forEach((variant, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'color-btn';
+                    btn.innerText = variant.name;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById('modalPrice').innerText = variant.price.toLocaleString('fa-IR');
                     };
-                    colorContainer.appendChild(circle);
+                    colorContainer.appendChild(btn);
                 });
+                // انتخاب خودکار اولین رنگ
+                colorContainer.firstChild.click();
             } else {
-                priceDisplay.innerText = Number(product.price).toLocaleString('fa-IR') + ' تومان';
+                document.getElementById('modalPrice').innerText = product.price.toLocaleString('fa-IR');
             }
 
-            document.getElementById('product-modal').style.display = 'flex';
+            document.getElementById('productModal').style.display = 'flex';
         }
 
-        loadProducts();
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        fetchProducts();
     </script>
 </body>
 </html>
