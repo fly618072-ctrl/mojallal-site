@@ -310,8 +310,8 @@ function cardHTML(p){
     <div class="thumb"><img src="${esc(safeImg(p.image_url))}" alt="${esc(p.title)}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK}'"></div>
     <h3 class="card-title">${esc(p.title)}</h3>
     <div class="meta"><span class="tag">${esc(p.category||'متفرقه')}</span><span class="cmp-toggle ${cmp.includes(String(p.id))?'on':''}" data-cmp="${esc(p.id)}" role="button" tabindex="0">⚖️ مقایسه</span></div>
-    ${disc(p)?`<div class="price-row" style="justify-content:flex-end"><span class="badge">${disc(p).toLocaleString('fa-IR')}٪</span><span class="old">${fmt(p.old_price)}</span></div>`:''}
-    <div class="price">${fmt(p.price)} ${p.price?'<small>تومان</small>':''}</div>
+    ${disc(p)&&!hasRange(p)?`<div class="price-row" style="justify-content:flex-end"><span class="badge">${disc(p).toLocaleString('fa-IR')}٪</span><span class="old">${fmt(p.old_price)}</span></div>`:''}
+    <div class="price">${hasRange(p)?'<small>از</small> ':''}${fmt(minPrice(p))} ${minPrice(p)?'<small>تومان</small>':''}</div>
   </button>`;
 }
 
@@ -339,20 +339,26 @@ document.addEventListener('click',e=>{
 });
 
 /* ---- Prices ---- */
-function disc(p){return(p.old_price&&p.price&&+p.old_price>+p.price)?Math.round((1-p.price/p.old_price)*100):0}
+function disc(p,price){price=price||p.price;return(p.old_price&&price&&+p.old_price>+price)?Math.round((1-price/p.old_price)*100):0}
 
 /* ---- Parsing colors & features ---- */
 const COLOR_MAP={'مشکی':'#111','سفید':'#fff','نقره‌ای':'#c0c0c8','نقره ای':'#c0c0c8','خاکستری':'#8a8a92','طوسی':'#8a8a92','طلایی':'#d4af37','قرمز':'#e53935','آبی':'#1e66d0','سرمه‌ای':'#1a2a5e','سبز':'#2e9e5b','زرد':'#f5c518','نارنجی':'#f57c00','صورتی':'#f48fb1','بنفش':'#7e57c2','قهوه‌ای':'#6d4c41','کرم':'#f1e4c8','بژ':'#e0cfa9','رزگلد':'#e8b4a0','تیتانیوم':'#8f8b85'};
+const toNum=t=>{const n=String(t).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،٬\s]/g,'');return /^\d+$/.test(n)?Number(n):0};
 function parseColors(p){
   let v=p.colors;if(!v)return[];
   if(typeof v==='string'){try{const j=JSON.parse(v);if(Array.isArray(j))v=j}catch(e){}}
   if(typeof v==='string')v=v.split(/[,،\n]/);
   return v.map(x=>{
-    if(typeof x==='object'&&x)return{name:x.name||'',hex:x.hex||COLOR_MAP[x.name]||'#ccc'};
-    const [n,h]=String(x).split(/[|:]/).map(t=>t.trim());
-    return n?{name:n,hex:(h&&/^#[0-9a-f]{3,8}$/i.test(h))?h:(COLOR_MAP[n]||'#ccc')}:null;
+    if(typeof x==='object'&&x)return{name:x.name||'',hex:x.hex||COLOR_MAP[x.name]||'#ccc',price:toNum(x.price||0)};
+    const parts=String(x).split(/[|:=]/).map(t=>t.trim()).filter(Boolean);
+    const n=parts.shift();if(!n)return null;
+    let hex=COLOR_MAP[n]||'#ccc',price=0;
+    parts.forEach(t=>{if(/^#[0-9a-f]{3,8}$/i.test(t))hex=t;else if(toNum(t))price=toNum(t)});
+    return{name:n,hex,price};
   }).filter(Boolean);
 }
+const minPrice=p=>{const ps=parseColors(p).map(c=>c.price).filter(Boolean);if(p.price)ps.push(+p.price);return ps.length?Math.min(...ps):0};
+const hasRange=p=>{const ps=new Set(parseColors(p).map(c=>c.price||+p.price).filter(Boolean));return ps.size>1};
 function parseSpecs(p){
   let v=p.specs;if(!v)return[];
   if(typeof v==='string'){try{v=JSON.parse(v)}catch(e){}}
@@ -364,9 +370,16 @@ const ICONS=[['باتری','🔋'],['دوربین','📷'],['رم','🧠'],['ح�
 const icon=k=>(ICONS.find(i=>k.includes(i[0]))||['','▪️'])[1];
 
 /* ---- Product page ---- */
+function renderPrice(p,price){
+  const d=disc(p,price);
+  $('deal').classList.toggle('hide',!d);$('deal-pct').textContent=d?`${d.toLocaleString('fa-IR')}٪ تخفیف`:'';
+  $('d-pricebox').innerHTML=price
+    ?`${d?`<div class="price-row"><span class="badge">${d.toLocaleString('fa-IR')}٪</span><span class="old">${fmt(p.old_price)}</span></div>`:''}<div class="big">${fmt(price)} <small>تومان</small></div>`
+    :`<div class="big">قیمت توافقی</div>`;
+}
 function showProduct(p){
   $('home').classList.add('hide');$('pdp-view').classList.remove('hide');
-  const c=p.category||'متفرقه',d=disc(p);
+  const c=p.category||'متفرقه';
   document.title=(p.title||'')+' | فروشگاه مجلل';
   $('crumbs').innerHTML=`<a onclick="location.hash=''">فروشگاه مجلل</a>/<a onclick="goCat('${esc(c)}')">${esc(c)}</a>/<b>${esc(p.title)}</b>`;
   $('d-img').src=safeImg(p.image_url);$('d-img').alt=p.title||'';
@@ -376,7 +389,7 @@ function showProduct(p){
   const cols=parseColors(p);
   $('colors-sec').classList.toggle('hide',!cols.length);
   if(cols.length){
-    const pick=i=>{$('d-colorname').textContent=cols[i].name;document.querySelectorAll('#d-colors .sw').forEach((b,j)=>b.classList.toggle('on',i===j))};
+    const pick=i=>{$('d-colorname').textContent=cols[i].name;renderPrice(p,cols[i].price||p.price);document.querySelectorAll('#d-colors .sw').forEach((b,j)=>b.classList.toggle('on',i===j))};
     $('d-colors').innerHTML=cols.map((x,i)=>`<button class="sw" title="${esc(x.name)}" aria-label="${esc(x.name)}"><i style="background:${esc(x.hex)}"></i></button>`).join('');
     document.querySelectorAll('#d-colors .sw').forEach((b,i)=>b.onclick=()=>pick(i));pick(0);
   }
@@ -384,10 +397,7 @@ function showProduct(p){
   $('feat-sec').classList.toggle('hide',!sp.length);
   $('d-feats').innerHTML=sp.map(([k,v])=>`<div class="row"><dt>${icon(k)} ${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
   $('d-desc').textContent=p.description||'توضیحی ثبت نشده است.';
-  $('deal').classList.toggle('hide',!d);$('deal-pct').textContent=d?`${d.toLocaleString('fa-IR')}٪ تخفیف`:'';
-  $('d-pricebox').innerHTML=p.price
-    ?`${d?`<div class="price-row"><span class="badge">${d.toLocaleString('fa-IR')}٪</span><span class="old">${fmt(p.old_price)}</span></div>`:''}<div class="big">${fmt(p.price)} <small>تومان</small></div>`
-    :`<div class="big">قیمت توافقی</div>`;
+  renderPrice(p,p.price);
   renderAction(p);
   const sim=all.filter(x=>x.id!==p.id&&(x.category||'')===(p.category||'')).slice(0,5);
   $('similar-wrap').classList.toggle('hide',!sim.length);
@@ -444,7 +454,7 @@ function openCmp(){
     ${row('کالا',p=>`<img src="${esc(safeImg(p.image_url))}" alt=""><b>${esc(p.title)}</b><br><a style="color:#1a73e8;cursor:pointer;font-size:12px" onclick="closeCmp();location.hash='p-${esc(p.id)}'">مشاهده کالا</a>`)}
     ${row('قیمت',p=>p.price?`<b>${fmt(p.price)}</b> تومان`:'توافقی')}
     ${row('دسته‌بندی',p=>esc(p.category||'متفرقه'))}
-    ${row('رنگ‌ها',p=>parseColors(p).map(c=>`<span style="white-space:nowrap"><i class="dot" style="background:${esc(c.hex)}"></i>${esc(c.name)}</span>`).join(' ')||'—')}
+    ${row('رنگ‌ها',p=>parseColors(p).map(c=>`<span style="white-space:nowrap"><i class="dot" style="background:${esc(c.hex)}"></i>${esc(c.name)}${c.price&&c.price!=p.price?` <small style="color:#81858b">(${fmt(c.price)})</small>`:''}</span>`).join(' ')||'—')}
     ${keys.map(k=>row(`${icon(k)} ${esc(k)}`,(p,i)=>{const f=specs[i].find(x=>x[0]===k);return f?esc(f[1]):'—'})).join('')}
   </table>`;
   $('cmp').classList.add('open');
