@@ -12,7 +12,7 @@
 <script>
 // Public browser key only. Never put a Supabase service_role/secret key in HTML.
 const SUPABASE_URL='https://fermurffpsawrpulsxun.supabase.co';
-const SUPABASE_ANON_KEY='PASTE_YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
 const CATS=[['همه','🛍️','همه کالاها'],['گوشی','📱','موبایل'],['لوازم خانگی','🏠','لوازم خانگی'],['مبلمان','🛋️','سرویس چوب']];
 const alias={'موبایل':'گوشی','سرویس چوب':'مبلمان'},$=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),imgURL=u=>/^https?:\/\//i.test(u||'')?u:'',money=n=>Number(n||0)?Number(n).toLocaleString('fa-IR')+' تومان':'قیمت توافقی';
 let db=null,all=[],category='همه',query='',sort='new',compare=[];
