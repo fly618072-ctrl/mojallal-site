@@ -1,3 +1,4 @@
+من یک سایت تا الان درست کردم 
 
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -304,7 +305,7 @@ body.pdp-on{padding-bottom:104px}
 <div id="toast" class="toast" role="status"></div>
 
 <script>
-const supabaseClient=supabase.createClient('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg');
+const supabaseClient=supabase.createClient('https://fermurffpsawrpulsxun.supabase.co','secret-c046662a');
 
 const CATS=[
   {n:'همه',i:'🛍️',l:'همه کالاها'},
@@ -317,7 +318,7 @@ const norm=c=>{c=(c||'').trim();return ALIAS[c]||c};
 const FALLBACK='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#f1f2f4"/><text x="50" y="64" font-size="40" text-anchor="middle">👑</text></svg>');
 
 /* ===== شناسه‌های ارتباطی: فقط داخل کوتیشن‌ها را پر کنید (بدون @) ===== */
-const CONTACT={rubika:'mojallal_market',eitaa:'mojallal_support'};
+const CONTACT={rubika:'',eitaa:''};
 const CONTACT_URL={rubika:'https://rubika.ir/',eitaa:'https://eitaa.com/'};
 let all=[],cat='همه',sortBy='new',query='',cmp=[],filt={min:0,max:0,disc:false};
 const $=id=>document.getElementById(id);
