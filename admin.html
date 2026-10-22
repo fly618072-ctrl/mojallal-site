@@ -2,8 +2,10 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
   <title>پنل مدیریت فروشگاه مجلل</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: Tahoma, sans-serif; }
     body { background-color: #121212; color: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
@@ -18,24 +20,26 @@
     button { width: 100%; padding: 12px; margin-top: 20px; border: none; border-radius: 6px; background: #d4af37; color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 15px; }
     button:hover { background: #e5c158; }
     button:disabled { background: #555; color: #888; cursor: not-allowed; }
+    button.ghost { background: #2a2a2a; color: #ccc; border: 1px solid #444; margin-top: 10px; font-weight: normal; }
     #loginSection { display: block; }
     #adminSection { display: none; }
     .hint { font-size: 11px; color: #777; margin-top: 4px; }
     #uploadStatus { font-size: 12px; color: #d4af37; margin-top: 6px; display: none; }
+    #loginErr { color: #ff6b6b; font-size: 13px; margin-top: 10px; min-height: 18px; }
   </style>
 </head>
 <body>
-
   <div class="card">
-    <!-- بخش ورود -->
     <div id="loginSection">
       <h2>ورود به پنل مجلل</h2>
-      <label>رمز عبور ادمین:</label>
-      <input type="password" id="adminPass" placeholder="رمز را وارد کنید">
-      <button onclick="checkLogin()">ورود</button>
+      <label>ایمیل:</label>
+      <input type="email" id="email" autocomplete="username" dir="ltr">
+      <label>رمز عبور:</label>
+      <input type="password" id="adminPass" autocomplete="current-password" dir="ltr">
+      <div id="loginErr"></div>
+      <button id="loginBtn" onclick="login()">ورود</button>
     </div>
 
-    <!-- فرم افزودن محصول -->
     <div id="adminSection">
       <h2>افزودن محصول جدید</h2>
 
@@ -70,57 +74,67 @@
       <textarea id="description" rows="2" placeholder="توضیحات کلی درباره کالا..."></textarea>
 
       <button id="submitBtn" onclick="saveProduct()">ثبت نهایی محصول</button>
+      <button class="ghost" onclick="logout()">خروج</button>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://fermurffpsawrpulsxun.supabase.co';
-    // کلید عمومی anon شما
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcm11cmZmcHNhd3JwdWxzeHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODkzODYsImV4cCI6MjEwNjk2NTM4Nn0.abW-PkWxNsybuDdmaf4PieW9kc1NPqjTdME9_DyAByg';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const $ = id => document.getElementById(id);
 
-    function checkLogin() {
-      const pass = document.getElementById('adminPass').value;
-      if (pass === '138989') {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminSection').style.display = 'block';
-      } else {
-        alert('رمز عبور اشتباه است!');
-      }
+    function showAdmin(on) {
+      $('loginSection').style.display = on ? 'none' : 'block';
+      $('adminSection').style.display = on ? 'block' : 'none';
     }
 
+    async function login() {
+      const btn = $('loginBtn');
+      $('loginErr').textContent = '';
+      btn.disabled = true;
+      const { error } = await sb.auth.signInWithPassword({
+        email: $('email').value.trim(),
+        password: $('adminPass').value
+      });
+      btn.disabled = false;
+      if (error) { $('loginErr').textContent = 'ایمیل یا رمز عبور اشتباه است.'; return; }
+      $('adminPass').value = '';
+      showAdmin(true);
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+      showAdmin(false);
+    }
+
+    // اگر قبلاً وارد شده بود، دوباره ورود نخواهد
+    sb.auth.getSession().then(({ data }) => showAdmin(!!data.session));
+
     function previewSelectedImage() {
-      const fileInput = document.getElementById('imageFile');
-      const previewImg = document.getElementById('previewImg');
-      if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
-          previewImg.style.display = 'block';
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-      }
+      const f = $('imageFile').files && $('imageFile').files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = e => { $('previewImg').src = e.target.result; $('previewImg').style.display = 'block'; };
+      reader.readAsDataURL(f);
     }
 
     async function saveProduct() {
-      const title = document.getElementById('title').value.trim();
-      const category = document.getElementById('category').value;
-      const price = document.getElementById('price').value.trim();
-      const fileInput = document.getElementById('imageFile');
-      const colors = document.getElementById('colors').value.trim();
-      const specs = document.getElementById('specs').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const submitBtn = document.getElementById('submitBtn');
-      const statusText = document.getElementById('uploadStatus');
+      const title = $('title').value.trim();
+      const category = $('category').value;
+      const price = $('price').value.trim();
+      const fileInput = $('imageFile');
+      const colors = $('colors').value.trim();
+      const specs = $('specs').value.trim();
+      const description = $('description').value.trim();
+      const submitBtn = $('submitBtn');
+      const statusText = $('uploadStatus');
 
-      if (!title || !price) {
-        alert('لطفاً نام کالا و قیمت را بنویسید.');
-        return;
-      }
-      if (!fileInput.files || fileInput.files.length === 0) {
-        alert('لطفاً یک عکس انتخاب کنید.');
-        return;
-      }
+      if (!title || !price) { alert('لطفاً نام کالا و قیمت را بنویسید.'); return; }
+      if (!fileInput.files || fileInput.files.length === 0) { alert('لطفاً یک عکس انتخاب کنید.'); return; }
+
+      const { data: sess } = await sb.auth.getSession();
+      if (!sess.session) { alert('نشست شما تمام شده است. دوباره وارد شوید.'); showAdmin(false); return; }
 
       const file = fileInput.files[0];
       submitBtn.disabled = true;
@@ -132,47 +146,26 @@
         const fileExt = file.name.split('.').pop();
         const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.' + fileExt;
 
-        // ۱. آپلود تصویر در استوریج
-        const { error: uploadError } = await sb.storage
-          .from('product-images')
-          .upload(fileName, file);
-
+        const { error: uploadError } = await sb.storage.from('product-images').upload(fileName, file);
         if (uploadError) throw new Error('خطا در آپلود عکس: ' + uploadError.message);
 
-        // ۲. ساخت لینک عکس
         const { data: urlData } = sb.storage.from('product-images').getPublicUrl(fileName);
-        const imageUrl = urlData.publicUrl;
 
-        // ۳. ثبت در جدول محصولات
         statusText.innerText = 'در حال ثبت در دیتابیس...';
-        const { error: insertError } = await sb
-          .from('products')
-          .insert([
-            {
-              title: title,
-              category: category,
-              price: Number(price),
-              image_url: imageUrl,
-              colors: colors || null,
-              specs: specs || null,
-              description: description || null
-            }
-          ]);
-
+        const { error: insertError } = await sb.from('products').insert([{
+          title, category,
+          price: Number(price),
+          image_url: urlData.publicUrl,
+          colors: colors || null,
+          specs: specs || null,
+          description: description || null
+        }]);
         if (insertError) throw new Error('خطا در ذخیره: ' + insertError.message);
 
         alert('✅ محصول با موفقیت ثبت شد!');
-
-        // پاک کردن فرم بعد از ثبت موفق
-        document.getElementById('title').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('colors').value = '';
-        document.getElementById('specs').value = '';
-        document.getElementById('description').value = '';
-        document.getElementById('imageFile').value = '';
-        document.getElementById('previewImg').style.display = 'none';
+        ['title', 'price', 'colors', 'specs', 'description', 'imageFile'].forEach(id => $(id).value = '');
+        $('previewImg').style.display = 'none';
         statusText.style.display = 'none';
-
       } catch (err) {
         alert('❌ ' + err.message);
       } finally {
