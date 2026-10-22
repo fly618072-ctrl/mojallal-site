@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#090909">
 <title>فروشگاه مجلل</title>
+<meta name="description" content="فروشگاه مجلل؛ موبایل، لوازم خانگی و سرویس چوب. کالا را از نزدیک ببینید و همان‌جا انتخاب کنید.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="فروشگاه مجلل">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:title" content="فروشگاه مجلل">
+<meta property="og:description" content="موبایل، لوازم خانگی و سرویس چوب را از نزدیک ببینید و همان‌جا انتخاب کنید.">
+<meta property="og:url" content="">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="فروشگاه مجلل">
+<meta name="twitter:description" content="موبایل، لوازم خانگی و سرویس چوب را از نزدیک ببینید و همان‌جا انتخاب کنید.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -234,6 +244,7 @@ body.pdp-on{padding-bottom:104px}
   <section class="amazing" id="amazing"><div class="amazing-head">🔥 تازه‌ترین آگهی‌ها</div><div class="strip" id="strip"></div></section>
   <div class="toolbar">
     <button type="button" class="filter-btn" id="fbtn" data-act="toggle-filter">⚙️ فیلتر <span id="fcount" class="hide"></span></button>
+    <button type="button" class="filter-btn" id="rbtn" data-act="refresh" aria-label="بروزرسانی لیست کالاها">🔄 بروزرسانی</button>
     <span class="count" id="count"></span>
     <div class="sort" id="sort">
       <button class="active" data-s="new">جدیدترین</button>
@@ -242,172 +253,4 @@ body.pdp-on{padding-bottom:104px}
     </div>
   </div>
   <div class="filters hide" id="filters">
-    <div class="f-group"><label for="f-min">قیمت از (تومان)</label><input id="f-min" type="text" inputmode="numeric" autocomplete="off" placeholder="مثلاً ۱۰۰۰۰۰۰۰"></div>
-    <div class="f-group"><label for="f-max">تا (تومان)</label><input id="f-max" type="text" inputmode="numeric" autocomplete="off" placeholder="مثلاً ۹۰۰۰۰۰۰۰"></div>
-    <label class="f-check"><input type="checkbox" id="f-disc"> فقط کالاهای تخفیف‌دار</label>
-    <button type="button" class="f-clear" data-act="clear-filter">پاک کردن فیلترها</button>
-  </div>
-  <div id="grid" class="grid"></div>
-</main>
-
-<section class="wrap hide" id="pdp-view">
-  <nav class="crumbs" id="crumbs"></nav>
-  <div class="pdp">
-    <div class="panel">
-      <div class="deal-bar hide" id="deal"><span>پیشنهاد ویژه</span><span id="deal-pct"></span></div>
-      <div class="pimg"><img id="d-img" src="" alt=""></div>
-    </div>
-    <div class="panel pinfo">
-      <button class="pcat" id="d-cat"></button>
-      <h1 id="d-title"></h1>
-      <div class="top-price" id="d-topprice"></div>
-      <div class="chips" id="d-chips"></div>
-      <div class="sec hide" id="colors-sec"><h3>رنگ: <span id="d-colorname"></span></h3><div class="swatches" id="d-colors"></div></div>
-      <div class="sec hide" id="feat-sec"><h3>ویژگی‌ها</h3><dl class="feats" id="d-feats"></dl><button type="button" class="more-feats hide" id="d-featmore" data-act="toggle-feats"></button></div>
-      <div class="sec"><h3>توضیحات</h3><p class="desc" id="d-desc"></p></div>
-      <div id="d-more"></div>
-    </div>
-    <aside class="buy">
-      <h4>فروشنده</h4>
-      <div class="seller"><i>👑</i><div>فروشگاه مجلل<small>رضایت از کالا <em>عالی</em></small></div></div>
-      <div class="price-box" id="d-pricebox"></div>
-      <div class="store-note">🏬 خرید فقط به‌صورت حضوری از فروشگاه</div>
-      <div class="contact-h">برای پرسیدن موجودی و قیمت پیام بدهید</div>
-      <div class="contact"><a data-contact="rubika"><i class="ci r"></i>روبیکا</a><a data-contact="eitaa"><i class="ci e"></i>ایتا</a></div>
-      <div style="height:12px"></div>
-      <div id="d-action" class="actions"></div>
-      <div class="perk">اصالت و سلامت فیزیکی کالا</div>
-      <div class="ship">✓ امکان مشاهده و بررسی کالا قبل از خرید<br>✓ تحویل در محل فروشگاه</div>
-    </aside>
-  </div>
-  <section class="similar hide" id="similar-wrap"><h2>کالاهای مشابه</h2><div class="grid" id="similar"></div></section>
-</section>
-
-<footer><div class="wrap"><b>فروشگاه مجلل</b>خرید مطمئن، انتخاب راحت<div class="foot-links"><a data-contact="rubika">روبیکا</a><a data-contact="eitaa">ایتا</a></div></div></footer>
-
-<div class="pricebar hide" id="pricebar"><button type="button" class="pb-btn" data-act="open-contact"><b>💬 ارتباط با فروشگاه</b><small>روبیکا و ایتا</small></button><div id="pb-price"></div></div>
-<div id="cmpbar" class="cmpbar hide">
-  <div class="cmp-items" id="cmp-items"></div>
-  <button class="btn-buy cmp-go" id="cmp-go" data-act="open-cmp">مقایسه</button>
-  <button class="cmp-clear" data-act="clear-cmp" aria-label="پاک کردن">✕</button>
-</div>
-<div id="cmp" class="backdrop" data-act="close-cmp-bg">
-  <div class="drawer"><button class="x" data-act="close-cmp" aria-label="بستن">✕</button><h2>مقایسهٔ کالاها</h2><div class="cmp-scroll" id="cmp-body"></div></div>
-</div>
-<div id="contact" class="backdrop sheet-bg" data-act="close-contact-bg">
-  <div class="drawer sheet"><button class="x" data-act="close-contact" aria-label="بستن">✕</button><h2>ارتباط با فروشگاه</h2>
-    <p class="sheet-note">برای پرسیدن موجودی، قیمت یا وقت بازدید پیام بدهید. خرید فقط به‌صورت حضوری است.</p>
-    <div class="sheet-links"><a data-contact="rubika"><i class="ci r"></i>ارتباط در روبیکا</a><a data-contact="eitaa"><i class="ci e"></i>ارتباط در ایتا</a></div>
-  </div>
-</div>
-<div id="toast" class="toast" role="status"></div>
-
-<script>
-const supabaseClient=supabase.createClient('https://fermurffpsawrpulsxun.supabase.co','GAPGPTMASKTOKEN1m4a7oplgduX0X');
-
-const CATS=[
-  {n:'همه',i:'🛍️',l:'همه کالاها'},
-  {n:'گوشی',i:'📱',l:'موبایل'},
-  {n:'لوازم خانگی',i:'🏠',l:'لوازم خانگی'},
-  {n:'مبلمان',i:'🛋️',l:'سرویس چوب'}
-];
-const ALIAS={'موبایل':'گوشی','سرویس چوب':'مبلمان'};
-const norm=c=>{c=(c||'').trim();return ALIAS[c]||c};
-const FALLBACK='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#f1f2f4"/><text x="50" y="64" font-size="40" text-anchor="middle">👑</text></svg>');
-
-/* ===== شناسه‌های ارتباطی: فقط داخل کوتیشن‌ها را پر کنید (بدون @) ===== */
-const CONTACT={rubika:'mojallal_market',eitaa:'mojallal_support'};
-const CONTACT_URL={rubika:'https://rubika.ir/',eitaa:'https://eitaa.com/'};
-let all=[],cat='همه',sortBy='new',query='',cmp=[],filt={min:0,max:0,disc:false};
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;n'}[c]));
-const fmt=n=>n?Number(n).toLocaleString('fa-IR'):'توافقی';
-const safeImg=u=>/^https?:\/\//i.test(u||'')?u:FALLBACK;
-const safeHex=h=>/^#[0-9a-f]{3,8}$/i.test(h||'')?h:'#ccc';
-const byId=id=>all.find(x=>String(x.id)===String(id));
-
-/* ---- Prices ---- */
-const toNum=t=>{const n=String(t).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,،٬\s]/g,'');return /^\d+$/.test(n)?Number(n):0};
-const COLOR_MAP={'مشکی':'#111','سفید':'#fff','نقره‌ای':'#c0c0c8','نقره ای':'#c0c0c8','خاکستری':'#8a8a92','طوسی':'#8a8a92','طلایی':'#d4af37','قرمز':'#e53935','آبی':'#1e66d0','سرمه‌ای':'#1a2a5e','سبز':'#2e9e5b','زرد':'#f5c518','نارنجی':'#f57c00','صورتی':'#f48fb1','بنفش':'#7e57c2','قهوه‌ای':'#6d4c41','کرم':'#f1e4c8','بژ':'#e0cfa9','رزگلد':'#e8b4a0','تیتانیوم':'#8f8b85'};
-function parseColors(p){
-  let v=p.colors;if(!v)return[];
-  if(typeof v==='string'){try{const j=JSON.parse(v);if(Array.isArray(j))v=j}catch(e){}}
-  if(typeof v==='string')v=v.split(/[,،\n]/);
-  if(!Array.isArray(v))return[];
-  return v.map(x=>{
-    if(typeof x==='object'&&x)return{name:x.name||'',hex:safeHex(x.hex||COLOR_MAP[x.name]),price:toNum(x.price||0)};
-    const parts=String(x).split(/[|:=]/).map(t=>t.trim()).filter(Boolean);
-    const n=parts.shift();if(!n)return null;
-    let hex=COLOR_MAP[n]||'#ccc',price=0;
-    parts.forEach(t=>{if(/^#[0-9a-f]{3,8}$/i.test(t))hex=t;else if(toNum(t))price=toNum(t)});
-    return{name:n,hex,price};
-  }).filter(Boolean);
-}
-const minPrice=p=>{const ps=parseColors(p).map(c=>c.price).filter(Boolean);if(p.price)ps.push(+p.price);return ps.length?Math.min(...ps):0};
-const hasRange=p=>{const ps=new Set(parseColors(p).map(c=>c.price||+p.price).filter(Boolean));return ps.size>1};
-const disc=(p,price)=>{price=price||p.price;return(p.old_price&&price&&+p.old_price>+price)?Math.round((1-price/p.old_price)*100):0};
-
-function parseSpecs(p){
-  let v=p.specs;if(!v)return[];
-  if(typeof v==='string'){try{v=JSON.parse(v)}catch(e){}}
-  if(Array.isArray(v))return v.map(x=>[x.name||x.key||'',x.value||'']).filter(x=>x[0]);
-  if(v&&typeof v==='object')return Object.entries(v);
-  return String(v).split('\n').map(l=>{const i=l.indexOf(':');if(i>0)return[l.slice(0,i).trim(),l.slice(i+1).trim()];const t=l.trim();return t?[t,'']:null}).filter(Boolean);
-}
-const ICONS=[['باتری','🔋'],['دوربین','📷'],['رم','🧠'],['حافظه','💾'],['صفحه','📺'],['نمایشگر','📺'],['پردازنده','⚙️'],['سیم','📶'],['وزن','⚖️'],['ظرفیت','📦'],['توان','⚡'],['ابعاد','📐'],['جنس','🪵'],['گارانتی','🛡️']];
-const icon=k=>(ICONS.find(i=>k.includes(i[0]))||['','▪️'])[1];
-
-/* ---- Home ---- */
-function buildNav(){
-  $('nav').innerHTML=CATS.map(c=>`<button data-c="${esc(c.n)}" class="${c.n===cat?'active':''}">${esc(c.l)}</button>`).join('');
-  $('circles').innerHTML=CATS.map(c=>`<button class="circle ${c.n===cat?'active':''}" data-c="${esc(c.n)}"><i>${c.i}</i>${esc(c.l)}</button>`).join('');
-}
-function cardHTML(p){
-  const mp=minPrice(p),d=hasRange(p)?0:disc(p,mp);
-  return `<div class="card" role="link" tabindex="0" data-id="${esc(p.id)}">
-    <div class="thumb"><img src="${esc(safeImg(p.image_url))}" alt="${esc(p.title)}" loading="lazy"></div>
-    <h3 class="card-title">${esc(p.title)}</h3>
-    <div class="meta"><span class="tag">${esc(p.category||'متفرقه')}</span><button type="button" class="cmp-toggle ${cmp.includes(String(p.id))?'on':''}" data-cmp="${esc(p.id)}">⚖️ مقایسه</button></div>
-    ${d?`<div class="price-row"><span class="badge">${d.toLocaleString('fa-IR')}٪</span><span class="old">${fmt(p.old_price)}</span></div>`:''}
-    <div class="price">${hasRange(p)?'<small>از</small> ':''}${fmt(mp)} ${mp?'<small>تومان</small>':''}</div>
-  </div>`;
-}
-function render(){
-  let list=all.filter(p=>cat==='همه'||norm(p.category)===cat);
-  if(query){const q=query.toLowerCase();list=list.filter(p=>(p.title||'').toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q))}
-  if(filt.min||filt.max||filt.disc)list=list.filter(p=>{
-    const mp=minPrice(p);
-    if((filt.min||filt.max)&&!mp)return false;
-    if(filt.min&&mp<filt.min)return false;
-    if(filt.max&&mp>filt.max)return false;
-    if(filt.disc&&!(disc(p,mp)>0||disc(p)>0))return false;
-    return true});
-  applyFilterUI();
-  if(sortBy==='cheap')list=[...list].sort((a,b)=>(minPrice(a)||Infinity)-(minPrice(b)||Infinity));
-  if(sortBy==='exp')list=[...list].sort((a,b)=>(minPrice(b)||-1)-(minPrice(a)||-1));
-  $('count').textContent=list.length?`${list.length.toLocaleString('fa-IR')} کالا`:'';
-  $('grid').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="status">هیچ آگهی‌ای پیدا نشد. دسته، فیلتر یا عبارت جستجو را تغییر دهید.</div>';
-  const recent=all.slice(0,8);
-  $('amazing').classList.toggle('show',cat==='همه'&&!query&&recent.length>=3);
-  $('strip').innerHTML=recent.map(cardHTML).join('');
-}
-async function load(){
-  $('grid').innerHTML='<div class="skeleton"></div>'.repeat(8);
-  try{
-    const {data,error}=await supabaseClient.from('products').select('*').order('id',{ascending:false});
-    if(error)throw error;
-    all=data||[];render();route();
-  }catch(err){
-    console.error(err);
-    $('grid').innerHTML='<div class="status">خطا در بارگذاری محصولات. لطفاً صفحه را دوباره باز کنید.</div>';
-  }
-}
-function resetAll(){cat='همه';query='';$('q').value='';buildNav();render();if(location.hash)location.hash='';scrollTo({top:0,behavior:'smooth'})}
-function goCat(c){cat=CATS.some(x=>x.n===norm(c))?norm(c):'همه';buildNav();render();location.hash=''}
-
-/* ---- Product page ---- */
-function renderPrice(p,price){
-  const d=disc(p,price);
-  $('deal').classList.toggle('hide',!d);$('deal-pct').textContent=d?`${d.toLocaleString('fa-IR')}٪ تخفیف`:'';
-  const h=price
-    ?`${d?`<div class="price-row"><span class="badge">${d.
+    <div class="f-group"><label for="f-min">قیمت از (تومان)</label><input id=
