@@ -105,7 +105,7 @@ footer{margin-top:40px;padding:30px 0;background:var(--ink);border-top:1px solid
 
 <div class="modal" id="imagemodal" data-act="closeimagebg"><div class="drawer zoomdrawer"><button class="x" data-act="closeimage">✕</button><img id="zoomimg" src="" alt=""></div></div>
 
-<div class="modal" id="contactmodal" data-act="closecontactbg"><div class="drawer" style="max-width:440px"><button class="x" data-act="closecontact">✕</button><h2>ارتباط با فروشگاه</h2><p class="about">برای پرسیدن موجودی، قیمت یا وقت بازدید پیام بدهید. خرید فقط به‌صورت حضوری است.</p><div class="contact" style="margin-top:16px"><a data-contact="rubika">🔴 روبیکا</a><a data-contact="eitaa">🟠 ایتا</a></div><div class="contact" style="margin-top:8px"><a id="phone2">📞 تماس با فروشگاه</a></div></div></div>
+<div class="modal" id="contactmodal" data-act="closecontactbg"><div class="drawer" style="max-width:440px"><button class="x" data-act="closecontact">✕</button><h2>ارتباط با فروشگاه</h2><p class="about">برای پرسیدن موجودی، قیمت یا وقت بازدید پیام بدهید. خرید فقط به‌صورت حضوری است.</p><div class="contact" style="margin-top:16px"><a data-contact="rubika">🔴 روبیکا</a><a data-contact="eitaa">🟠 ایتا</a></div><div class="contact" style="margin-top:8px"><a id="phone2">📞 تماس</a><a id="whatsapp2" target="_blank">🟢 واتساپ</a></div></div></div>
 
 <div class="modal" id="aboutmodal" data-act="closeaboutbg"><div class="drawer"><button class="x" data-act="closeabout">✕</button><h2>درباره فروشگاه و قوانین خرید</h2><div class="about"><h3>فروشگاه مجلل</h3><p>فروشگاه مجلل مجموعه‌ای از کالاهای موبایل، لوازم خانگی و سرویس چوب را برای بازدید و خرید حضوری ارائه می‌کند. هدف ما انتخاب مطمئن‌تر مشتریان با امکان مشاهده و بررسی کالا پیش از خرید است.</p><h3>شرایط خرید حضوری</h3><p>خرید محصولات فقط به‌صورت حضوری از فروشگاه انجام می‌شود. پیش از مراجعه، برای اطمینان از موجودی و قیمت روز، تماس بگیرید یا در واتساپ، روبیکا و ایتا پیام بدهید.</p><h3>موجودی و قیمت</h3><p>وضعیت موجودی هر کالا در سایت مشخص است؛ با این حال، به علت فروش حضوری، موجودی و قیمت ممکن است تا زمان مراجعه تغییر کند.</p><h3>مرجوعی و ضمانت</h3><p>سلامت ظاهری و مشخصات کالا هنگام تحویل قابل بررسی است. شرایط گارانتی و مرجوعی هر کالا در صورت وجود، هنگام خرید حضوری توسط فروشگاه اعلام می‌شود.</p></div></div></div>
 
@@ -117,6 +117,7 @@ const db=supabase.createClient('https://fermurffpsawrpulsxun.supabase.co','eyJhb
 const CONTACT={rubika:'mojallal_market',eitaa:'mojallal_support'};
 const STORE={
  phone:'09055526197',
+ whatsapp:'989121234567',
  address:'مشهد _ بلوار توس _ بین توس 102 و 104',
  hours:'شنبه تا 5 شنبه 9 صبح تا 10 شب به صورت یکسره _ جمعه ها 4 عصر تا 10 شب',
  map:'https://neshan.org/maps/@36.40235110106153,59.50645983688901,15.0z,0.0p'
