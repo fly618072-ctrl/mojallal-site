@@ -407,11 +407,12 @@ body.modal-open{overflow:hidden}
   body.product-open.hasbar{padding-bottom:190px}
   .mobile-pricebar{
     position:fixed;right:0;bottom:0;left:0;z-index:80;
-    display:flex;align-items:center;gap:10px;
+    display:none;align-items:center;gap:10px;
     min-height:82px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
     border-top:1px solid #d9b86b77;background:#101119f8;
     box-shadow:0 -8px 30px #0005;backdrop-filter:blur(16px)
   }
+  body.product-open .mobile-pricebar{display:flex}
   .mobile-price-info{flex:1;min-width:0}
   .mobile-price-info small{display:block;margin-bottom:3px;color:var(--muted);font-size:9px}
   #mobilePrice{color:var(--gold-light);font-size:20px;font-weight:900}
