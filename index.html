@@ -100,7 +100,7 @@ header{
 .btn.gold{color:#171208;background:linear-gradient(130deg,#eed49a,#c69d4d);border:0}
 .nav{display:flex;gap:4px;overflow:auto}
 .nav button{padding:11px 16px;color:var(--muted);font-size:12px;white-space:nowrap;border-bottom:2px solid transparent}
-.nav button.active{color:var(--gold-light);border-color:var(--gold)}
+.nav button.active{color:var(--gold-light);border-color:#d9b86b}
 
 .hero{
   display:grid;grid-template-columns:1.2fr 1fr;align-items:center;gap:25px;
@@ -641,7 +641,7 @@ body.modal-open{overflow:hidden}
 "use strict";
 
 const SUPABASE_URL="https://fermurffpsawrpulsxun.supabase.co";
-const SUPABASE_ANON_KEY="GAPGPTMASKTOKENkhzjcpajuspX0X";
+const SUPABASE_ANON_KEY="GAPGPTMASKTOKENnv677lfa5oX0X";
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -683,12 +683,4 @@ let category="همه";
 let search="";
 let sorting="new";
 let favorites=[];
-let favoritesOnly=false;
-let current=null;
-let gallery=[];
-let galleryIndex=0;
-let toastTimer=null;
-let filter={min:0,max:0,discount:false,available:false};
-
-try{
-favorite
+let favori
